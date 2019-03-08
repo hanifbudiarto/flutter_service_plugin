@@ -70,7 +70,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         try {
             SQLiteDatabase db = this.getReadableDatabase();
-            String selectQuery = "select api_username, api_password, broker from user limit 1";
+            String selectQuery = "select api_username, api_password, broker from user order by api_id desc limit 1";
 
             Cursor cursor = db.rawQuery(selectQuery, null);
 

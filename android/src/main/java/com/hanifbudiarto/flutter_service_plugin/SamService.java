@@ -169,6 +169,7 @@ public class SamService extends Service {
             public void connectComplete(boolean reconnect, String serverURI) {
                 if (reconnect) {
                     Log.d(TAG, "reconnect to "+ broker);
+                    Log.d(TAG, "Reconnecting with username : " + username + " & password : " + password + " to "+ broker);
                     subscribeTopics();
                 }
                 else {
@@ -178,7 +179,7 @@ public class SamService extends Service {
 
             @Override
             public void connectionLost(Throwable cause) {
-                Log.d(TAG, "The Connection was lost.");
+                Log.d(TAG, "The Connection was lost. " + cause.getMessage());
             }
 
             @Override
