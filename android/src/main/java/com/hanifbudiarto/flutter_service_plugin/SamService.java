@@ -16,6 +16,7 @@ import android.util.Log;
 
 import com.hanifbudiarto.flutter_service_plugin.model.MqttNotification;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttPayload;
+import com.hanifbudiarto.flutter_service_plugin.model.User;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
@@ -69,8 +70,6 @@ public class SamService extends Service {
 
     // util
     private SimpleDateFormat formatter;
-    // preferences
-    SharedPreferences prefs;
 
     // onCreate will be executed only once on a lifetime
     @Override
@@ -79,14 +78,17 @@ public class SamService extends Service {
 
         dbHelper  = new DatabaseHelper(this);
         formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        broker = "ssl//:" + prefs.getString("broker", "somewhere_broker") + ":8883";
-        username = prefs.getString("api_key", "someone_username");
-        password = prefs.getString("api_token", "someone_password");
+        User user = dbHelper.getUser();
+
+        if (user != null) {
+            broker = "ssl://" + user.getBroker() + ":8883";
+            username = user.getApiKey();
+            password = user.getApiToken();
+        }
 
         // so initialize mqtt client object and its options
         initMqttOptions();

@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.google.gson.Gson;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttNotification;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttOption;
+import com.hanifbudiarto.flutter_service_plugin.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +63,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
 
         return notification;
+    }
+
+    User getUser() {
+        User user = null;
+
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+            String selectQuery = "select api_username, api_password, broker from user limit 1";
+
+            Cursor cursor = db.rawQuery(selectQuery, null);
+
+            // looping through all rows and adding to list
+            if (cursor.moveToFirst()) {
+                do {
+                    user = new User(cursor.getString(0),
+                            cursor.getString(1),
+                            cursor.getString(2));
+
+                } while (cursor.moveToNext());
+            }
+
+            // close cursor
+            cursor.close();
+
+            // close db connection
+            db.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return user;
     }
 
     List<MqttNotification> getNotifications() {
