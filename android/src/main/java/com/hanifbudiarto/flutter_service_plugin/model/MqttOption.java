@@ -21,11 +21,11 @@ public class MqttOption {
         this.rule = rule;
     }
 
-    public double getValue() {
+    public double getThreshold() {
         return threshold;
     }
 
-    public void setValue(double value) {
+    public void setThreshold(double value) {
         this.threshold = value;
     }
 

@@ -33,11 +33,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
 
-    public List<MqttNotification> getNotifications() {
-        List<MqttNotification> notifications = new ArrayList<>();
+    MqttNotification getNotificationsByTopic(String topic) {
+        MqttNotification notification = null;
 
         SQLiteDatabase db = this.getReadableDatabase();
-        String selectQuery = "select analytic_id, analytic_resource_id, topic, options from notification";
+        String selectQuery = "select analytic_id, analytic_resource_id, topic, options from notification where topic = '" +topic+"' limit 1";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -46,19 +46,57 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             do {
                 MqttOption option = gson.fromJson(cursor.getString(3), MqttOption.class);
 
-                MqttNotification notification = new MqttNotification(
+                MqttNotification result = new MqttNotification(
                         cursor.getString(0),
                         cursor.getString(1),
                         cursor.getString(2),
                         option
                 );
 
-                notifications.add(notification);
+                notification = result;
+
             } while (cursor.moveToNext());
         }
 
         // close db connection
         db.close();
+
+        return notification;
+    }
+
+    List<MqttNotification> getNotifications() {
+        List<MqttNotification> notifications = new ArrayList<>();
+
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+            String selectQuery = "select analytic_id, analytic_resource_id, topic, options from notification";
+
+            Cursor cursor = db.rawQuery(selectQuery, null);
+
+            // looping through all rows and adding to list
+            if (cursor.moveToFirst()) {
+                do {
+                    MqttOption option = gson.fromJson(cursor.getString(3), MqttOption.class);
+
+                    MqttNotification notification = new MqttNotification(
+                            cursor.getString(0),
+                            cursor.getString(1),
+                            cursor.getString(2),
+                            option
+                    );
+
+                    notifications.add(notification);
+                } while (cursor.moveToNext());
+            }
+
+            // close cursor
+            cursor.close();
+
+            // close db connection
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return notifications;
     }

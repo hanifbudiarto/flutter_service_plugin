@@ -6,7 +6,14 @@
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="31632b95-8f49-43cf-844b-7048997fe8d9" name="Default Changelist" comment="" />
+    <list default="true" id="31632b95-8f49-43cf-844b-7048997fe8d9" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/hanifbudiarto/flutter_service_plugin/DatabaseHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/hanifbudiarto/flutter_service_plugin/DatabaseHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/hanifbudiarto/flutter_service_plugin/SamService.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/hanifbudiarto/flutter_service_plugin/SamService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/hanifbudiarto/flutter_service_plugin/model/MqttOption.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/hanifbudiarto/flutter_service_plugin/model/MqttOption.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/flutter_service_plugin.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/flutter_service_plugin.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/flutter_service_plugin_test.dart" beforeDir="false" />
+    </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
     <ignored path="$PROJECT_DIR$/.pub/" />
@@ -23,35 +30,39 @@
     <session id="1944825968">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="3" />
-          <entry key="project.open.time.3" value="1" />
+          <entry key="project.closed" value="6" />
+          <entry key="project.open.time.1" value="1" />
+          <entry key="project.open.time.21" value="1" />
+          <entry key="project.open.time.3" value="2" />
           <entry key="project.open.time.5" value="2" />
-          <entry key="project.opened" value="3" />
+          <entry key="project.opened" value="6" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="dart" value="609" />
+          <entry key="xml" value="12" />
           <entry key="yaml" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="Dart" value="609" />
+          <entry key="XML" value="12" />
           <entry key="YAML" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="dart" value="1" />
-          <entry key="xml" value="3" />
+          <entry key="dart" value="4" />
+          <entry key="xml" value="4" />
           <entry key="yaml" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Dart" value="1" />
-          <entry key="XML" value="3" />
+          <entry key="Dart" value="4" />
+          <entry key="XML" value="4" />
           <entry key="YAML" value="1" />
         </counts>
       </usages-collector>
@@ -59,24 +70,37 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/flutter_service_plugin.dart">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret column="20" selection-start-column="20" selection-end-column="20" />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/android/src/main/AndroidManifest.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="15" lean-forward="true" selection-start-line="15" selection-end-line="15" />
+            <state relative-caret-position="238">
+              <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/example/pubspec.yaml" />
-        <option value="$PROJECT_DIR$/lib/flutter_service_plugin.dart" />
         <option value="$PROJECT_DIR$/example/lib/main.dart" />
         <option value="$PROJECT_DIR$/test/flutter_service_plugin_test.dart" />
+        <option value="$PROJECT_DIR$/android/src/main/AndroidManifest.xml" />
+        <option value="$PROJECT_DIR$/lib/flutter_service_plugin.dart" />
       </list>
     </option>
   </component>
@@ -86,14 +110,12 @@
     <option name="width" value="1400" />
     <option name="height" value="820" />
   </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
-      <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -115,29 +137,16 @@
             <path>
               <item name="flutter_service_plugin" type="b2602c69:ProjectViewProjectNode" />
               <item name="flutter_service_plugin" type="462c0819:PsiDirectoryNode" />
-              <item name="example" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="flutter_service_plugin" type="b2602c69:ProjectViewProjectNode" />
-              <item name="flutter_service_plugin" type="462c0819:PsiDirectoryNode" />
-              <item name="example" type="462c0819:PsiDirectoryNode" />
               <item name="lib" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="flutter_service_plugin" type="b2602c69:ProjectViewProjectNode" />
-              <item name="flutter_service_plugin" type="462c0819:PsiDirectoryNode" />
-              <item name="lib" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="flutter_service_plugin" type="b2602c69:ProjectViewProjectNode" />
-              <item name="flutter_service_plugin" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
         <option name="show-excluded-files" value="false" />
       </pane>
+      <pane id="Scope" />
+      <pane id="AndroidView" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -188,7 +197,7 @@
       <window_info anchor="bottom" id="Android Profiler" order="3" show_stripe_button="false" />
       <window_info anchor="bottom" id="Logcat" order="4" weight="0.7749326" />
       <window_info anchor="bottom" id="Debug" order="5" />
-      <window_info anchor="bottom" id="Terminal" order="6" />
+      <window_info anchor="bottom" id="Terminal" order="6" visible="true" weight="0.32884097" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Flutter Performance" order="8" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="9" show_stripe_button="false" />
@@ -212,23 +221,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/flutter_service_plugin.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="11" column="3" lean-forward="true" selection-start-line="11" selection-start-column="3" selection-end-line="11" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/flutter_service_plugin_test.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
-          <folding>
-            <element signature="e#0#39#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="357">
@@ -239,10 +231,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/android/src/main/AndroidManifest.xml">
+    <entry file="file://$PROJECT_DIR$/test/flutter_service_plugin_test.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
-          <caret line="15" lean-forward="true" selection-start-line="15" selection-end-line="15" />
+          <caret line="15" column="5" lean-forward="true" selection-start-line="15" selection-start-column="5" selection-end-line="15" selection-end-column="5" />
+          <folding>
+            <element signature="e#0#39#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/flutter_service_plugin.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="20" selection-start-column="20" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/android/src/main/AndroidManifest.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
         </state>
       </provider>
     </entry>

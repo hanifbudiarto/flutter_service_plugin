@@ -12,9 +12,9 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 /** FlutterServicePlugin */
 public class FlutterServicePlugin implements MethodCallHandler {
 
-  public static Activity activity;
+  private Activity activity;
 
-  FlutterServicePlugin(Activity activity) {
+  private FlutterServicePlugin(Activity activity) {
     this.activity = activity;
   }
 
@@ -26,14 +26,19 @@ public class FlutterServicePlugin implements MethodCallHandler {
 
   @Override
   public void onMethodCall(MethodCall call, Result result) {
-    if (call.method.equals("startMqttService")) {
-      startMqttService();
-    } else if (call.method.equals("restartMqttService")) {
-      restartMqttService();
-    } else if (call.method.equals("stopMqttService")) {
-      stopMqttService();
-    } else {
-      result.notImplemented();
+    switch (call.method) {
+      case "startMqttService":
+        startMqttService();
+        break;
+      case "restartMqttService":
+        restartMqttService();
+        break;
+      case "stopMqttService":
+        stopMqttService();
+        break;
+      default:
+        result.notImplemented();
+        break;
     }
   }
 

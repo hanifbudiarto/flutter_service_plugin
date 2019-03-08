@@ -1,14 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.hanifbudiarto.flutter_service_plugin">
-
-    <uses-permission android:name="android.permission.INTERNET"/>
+    package="com.hanifbudiarto.flutter_service_plugin">
+    <!-- Permissions the Application Requires -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
-    <application
-        android:name="io.flutter.app.FlutterApplication">
-        <service android:name="org.eclipse.paho.android.service.MqttService" android:exported="true"></service>
-        <service android:name=".SamService" android:exported="true"></service>
+    <application android:name="io.flutter.app.FlutterApplication">
+        <activity android:name=".AlarmActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:showOnLockScreen="true" android:turnScreenOn="true"/>
+
+        <service android:name="org.eclipse.paho.android.service.MqttService" />
+        <service android:name=".SamService" />
     </application>
+
 </manifest>
