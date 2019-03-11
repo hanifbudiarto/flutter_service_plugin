@@ -120,21 +120,21 @@ public class SamService extends Service {
             public void connectComplete(boolean reconnect, String serverURI) {
                 if (reconnect) {
                     Log.d(TAG, "Reconnecting broo");
-                    try {
-                        cobaMqttAndroidClient.subscribe(topics, qoss, null, new IMqttActionListener() {
-                            @Override
-                            public void onSuccess(IMqttToken asyncActionToken) {
-                                Log.d(TAG, "Successfully subscribed broo");
-                            }
-
-                            @Override
-                            public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                                Log.d(TAG, "Gagal subcribe "+ exception.getMessage());
-                            }
-                        });
-                    } catch (MqttException e) {
-                        e.printStackTrace();
-                    }
+//                    try {
+//                        cobaMqttAndroidClient.subscribe(topics, qoss, null, new IMqttActionListener() {
+//                            @Override
+//                            public void onSuccess(IMqttToken asyncActionToken) {
+//                                Log.d(TAG, "Successfully subscribed broo");
+//                            }
+//
+//                            @Override
+//                            public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+//                                Log.d(TAG, "Gagal subcribe "+ exception.getMessage());
+//                            }
+//                        });
+//                    } catch (MqttException e) {
+//                        e.printStackTrace();
+//                    }
                 }
                 else Log.d(TAG, "Connected to broker bro");
             }
