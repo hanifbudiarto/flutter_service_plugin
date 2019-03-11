@@ -22,6 +22,7 @@ import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
@@ -96,15 +97,75 @@ public class SamService extends Service {
             Log.d(TAG, "user is null");
         }
 
-        // so initialize mqtt client object and its options
-        initMqttOptions();
-        initMqttClient();
+        MqttConnectOptions cobaMqttConnectOptions = new MqttConnectOptions();
+        cobaMqttConnectOptions.setCleanSession(true);
+        cobaMqttConnectOptions.setAutomaticReconnect(true);
+        cobaMqttConnectOptions.setUserName(username);
+        cobaMqttConnectOptions.setPassword(password.toCharArray());
 
-        // get topics from database
-        loadMqttTopics();
+        if (broker.contains("ssl")) {
+            SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();
+            try {
+                socketFactoryOptions.withCaInputStream(getResources().openRawResource(R.raw.cafile));
+                cobaMqttConnectOptions.setSocketFactory(new SocketFactory(socketFactoryOptions));
+            } catch (IOException | NoSuchAlgorithmException | KeyStoreException | CertificateException | KeyManagementException | UnrecoverableKeyException e) {
+                e.printStackTrace();
+            }
+        }
 
-        // connect to broker
-        mqttConnect();
+        MqttAndroidClient cobaMqttAndroidClient = new MqttAndroidClient(this, broker, MqttClient.generateClientId() );
+        cobaMqttAndroidClient.setCallback(new MqttCallbackExtended() {
+            @Override
+            public void connectComplete(boolean reconnect, String serverURI) {
+                if (reconnect) {
+                    Log.d(TAG, "Reconnecting broo");
+                }
+
+                else Log.d(TAG, "Connected to broker bro");
+            }
+
+            @Override
+            public void connectionLost(Throwable cause) {
+
+            }
+
+            @Override
+            public void messageArrived(String topic, MqttMessage message) throws Exception {
+
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken token) {
+
+            }
+        });
+
+        try {
+            cobaMqttAndroidClient.connect(cobaMqttConnectOptions, null, new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    Log.d(TAG, "success koneek");
+                }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    Log.d(TAG, "Gatot konek");
+                }
+            });
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+
+
+//        // so initialize mqtt client object and its options
+//        initMqttOptions();
+//        initMqttClient();
+//
+//        // get topics from database
+//        loadMqttTopics();
+//
+//        // connect to broker
+//        mqttConnect();
         return Service.START_STICKY;
     }
 
@@ -144,6 +205,8 @@ public class SamService extends Service {
 
     }
 
+
+    // no problem
     private void initMqttOptions() {
         mqttConnectOptions = new MqttConnectOptions();
         mqttConnectOptions.setCleanSession(true);
@@ -326,12 +389,12 @@ public class SamService extends Service {
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.d(TAG, "Successfully connected");
 
-//                    DisconnectedBufferOptions disconnectedBufferOptions = new DisconnectedBufferOptions();
-//                    disconnectedBufferOptions.setBufferEnabled(true);
-//                    disconnectedBufferOptions.setBufferSize(100);
-//                    disconnectedBufferOptions.setPersistBuffer(false);
-//                    disconnectedBufferOptions.setDeleteOldestMessages(false);
-//                    mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
+                    DisconnectedBufferOptions disconnectedBufferOptions = new DisconnectedBufferOptions();
+                    disconnectedBufferOptions.setBufferEnabled(true);
+                    disconnectedBufferOptions.setBufferSize(100);
+                    disconnectedBufferOptions.setPersistBuffer(false);
+                    disconnectedBufferOptions.setDeleteOldestMessages(false);
+                    mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
 
                     subscribeTopics();
                 }
