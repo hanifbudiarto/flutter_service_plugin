@@ -113,7 +113,7 @@ public class SamService extends Service {
             }
         }
 
-        MqttAndroidClient cobaMqttAndroidClient = new MqttAndroidClient(this, broker, MqttClient.generateClientId() );
+        final MqttAndroidClient cobaMqttAndroidClient = new MqttAndroidClient(this, broker, MqttClient.generateClientId() );
         cobaMqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean reconnect, String serverURI) {
@@ -145,6 +145,30 @@ public class SamService extends Service {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.d(TAG, "success koneek");
+
+                    DisconnectedBufferOptions disconnectedBufferOptions = new DisconnectedBufferOptions();
+                    disconnectedBufferOptions.setBufferEnabled(true);
+                    disconnectedBufferOptions.setBufferSize(100);
+                    disconnectedBufferOptions.setPersistBuffer(false);
+                    disconnectedBufferOptions.setDeleteOldestMessages(false);
+                    cobaMqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
+
+
+                    try {
+                        cobaMqttAndroidClient.subscribe(topics, qoss, null, new IMqttActionListener() {
+                            @Override
+                            public void onSuccess(IMqttToken asyncActionToken) {
+                                Log.d(TAG, "Successfully subscribed broo");
+                            }
+
+                            @Override
+                            public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                Log.d(TAG, "Gagal subcribe "+ exception.getMessage());
+                            }
+                        });
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
