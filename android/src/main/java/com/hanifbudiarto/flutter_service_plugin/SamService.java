@@ -60,8 +60,8 @@ public class SamService extends Service {
     private String password = "someone_password";
 
     // MQTT Client and its connection options
-    private MqttAndroidClient mqttAndroidClient;
-    private MqttConnectOptions mqttConnectOptions;
+//    private MqttAndroidClient mqttAndroidClient;
+//    private MqttConnectOptions mqttConnectOptions;
 
     // list of topics and its QOS s
     private String[] topics;
@@ -97,7 +97,7 @@ public class SamService extends Service {
             Log.d(TAG, "user is null");
         }
 
-        /*
+
         MqttConnectOptions cobaMqttConnectOptions = new MqttConnectOptions();
         cobaMqttConnectOptions.setCleanSession(true);
         cobaMqttConnectOptions.setAutomaticReconnect(true);
@@ -120,8 +120,22 @@ public class SamService extends Service {
             public void connectComplete(boolean reconnect, String serverURI) {
                 if (reconnect) {
                     Log.d(TAG, "Reconnecting broo");
-                }
+                    try {
+                        cobaMqttAndroidClient.subscribe(topics, qoss, null, new IMqttActionListener() {
+                            @Override
+                            public void onSuccess(IMqttToken asyncActionToken) {
+                                Log.d(TAG, "Successfully subscribed broo");
+                            }
 
+                            @Override
+                            public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                Log.d(TAG, "Gagal subcribe "+ exception.getMessage());
+                            }
+                        });
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
+                }
                 else Log.d(TAG, "Connected to broker bro");
             }
 
@@ -132,7 +146,8 @@ public class SamService extends Service {
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
-
+                String msg = new String(message.getPayload());
+                onMessageReceived(topic, getPayload(msg));
             }
 
             @Override
@@ -140,6 +155,8 @@ public class SamService extends Service {
 
             }
         });
+
+        loadMqttTopics();
 
         try {
             cobaMqttAndroidClient.connect(cobaMqttConnectOptions, null, new IMqttActionListener() {
@@ -180,17 +197,17 @@ public class SamService extends Service {
         } catch (MqttException e) {
             e.printStackTrace();
         }
-        */
 
-        // so initialize mqtt client object and its options
-        initMqttOptions();
-        initMqttClient();
 
-        // get topics from database
-        loadMqttTopics();
-
-        // connect to broker
-        mqttConnect();
+//        // so initialize mqtt client object and its options
+//        initMqttOptions();
+//        initMqttClient();
+//
+//        // get topics from database
+//        loadMqttTopics();
+//
+//        // connect to broker
+//        mqttConnect();
         return Service.START_STICKY;
     }
 
@@ -203,10 +220,10 @@ public class SamService extends Service {
 
     @Override
     public void onDestroy() {
-        if (mqttAndroidClient != null) {
-            mqttAndroidClient.unregisterResources();
-            mqttAndroidClient.close();
-        }
+//        if (mqttAndroidClient != null) {
+//            mqttAndroidClient.unregisterResources();
+//            mqttAndroidClient.close();
+//        }
 
         super.onDestroy();
     }
@@ -230,57 +247,57 @@ public class SamService extends Service {
 
     }
 
-    private void initMqttOptions() {
-        mqttConnectOptions = new MqttConnectOptions();
-        mqttConnectOptions.setCleanSession(true);
-        mqttConnectOptions.setAutomaticReconnect(true);
-        mqttConnectOptions.setUserName(username);
-        mqttConnectOptions.setPassword(password.toCharArray());
-
-        if (broker.contains("ssl")) {
-            SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();
-            try {
-                socketFactoryOptions.withCaInputStream(getResources().openRawResource(R.raw.cafile));
-                mqttConnectOptions.setSocketFactory(new SocketFactory(socketFactoryOptions));
-            } catch (IOException | NoSuchAlgorithmException | KeyStoreException | CertificateException | KeyManagementException | UnrecoverableKeyException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void initMqttClient() {
-        Log.d(TAG, "initiating");
-        mqttAndroidClient = new MqttAndroidClient(this, broker, MqttClient.generateClientId() );
-        mqttAndroidClient.setCallback(new MqttCallbackExtended() {
-            @Override
-            public void connectComplete(boolean reconnect, String serverURI) {
-                if (reconnect) {
-                    Log.d(TAG, "reconnect to "+ broker);
-                    Log.d(TAG, "Reconnecting with username : " + username + " & password : " + password + " to "+ broker);
-                    subscribeTopics();
-                }
-                else {
-                    Log.d(TAG, "connected to "+ broker);
-                }
-            }
-
-            @Override
-            public void connectionLost(Throwable cause) {
-                Log.d(TAG, "The Connection was lost. " + cause.getMessage());
-            }
-
-            @Override
-            public void messageArrived(String topic, MqttMessage message) throws Exception {
-                String msg = new String(message.getPayload());
-                onMessageReceived(topic, getPayload(msg));
-            }
-
-            @Override
-            public void deliveryComplete(IMqttDeliveryToken token) {
-                Log.d(TAG, "deliveryComplete");
-            }
-        });
-    }
+//    private void initMqttOptions() {
+//        mqttConnectOptions = new MqttConnectOptions();
+//        mqttConnectOptions.setCleanSession(true);
+//        mqttConnectOptions.setAutomaticReconnect(true);
+//        mqttConnectOptions.setUserName(username);
+//        mqttConnectOptions.setPassword(password.toCharArray());
+//
+//        if (broker.contains("ssl")) {
+//            SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();
+//            try {
+//                socketFactoryOptions.withCaInputStream(getResources().openRawResource(R.raw.cafile));
+//                mqttConnectOptions.setSocketFactory(new SocketFactory(socketFactoryOptions));
+//            } catch (IOException | NoSuchAlgorithmException | KeyStoreException | CertificateException | KeyManagementException | UnrecoverableKeyException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
+//
+//    private void initMqttClient() {
+//        Log.d(TAG, "initiating");
+//        mqttAndroidClient = new MqttAndroidClient(this, broker, MqttClient.generateClientId() );
+//        mqttAndroidClient.setCallback(new MqttCallbackExtended() {
+//            @Override
+//            public void connectComplete(boolean reconnect, String serverURI) {
+//                if (reconnect) {
+//                    Log.d(TAG, "reconnect to "+ broker);
+//                    Log.d(TAG, "Reconnecting with username : " + username + " & password : " + password + " to "+ broker);
+//                    subscribeTopics();
+//                }
+//                else {
+//                    Log.d(TAG, "connected to "+ broker);
+//                }
+//            }
+//
+//            @Override
+//            public void connectionLost(Throwable cause) {
+//                Log.d(TAG, "The Connection was lost. " + cause.getMessage());
+//            }
+//
+//            @Override
+//            public void messageArrived(String topic, MqttMessage message) throws Exception {
+//                String msg = new String(message.getPayload());
+//                onMessageReceived(topic, getPayload(msg));
+//            }
+//
+//            @Override
+//            public void deliveryComplete(IMqttDeliveryToken token) {
+//                Log.d(TAG, "deliveryComplete");
+//            }
+//        });
+//    }
 
     private MqttPayload getPayload(String message) {
         MqttPayload payload = null;
@@ -403,34 +420,34 @@ public class SamService extends Service {
         Log.d(TAG, "End notification");
     }
 
-    private void mqttConnect() {
-        Log.d(TAG, "Connecting with username : " + username + " & password : " + password + " to "+ broker);
-
-        try {
-            mqttAndroidClient.connect(mqttConnectOptions, null, new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.d(TAG, "Successfully connected");
-
-                    DisconnectedBufferOptions disconnectedBufferOptions = new DisconnectedBufferOptions();
-                    disconnectedBufferOptions.setBufferEnabled(true);
-                    disconnectedBufferOptions.setBufferSize(100);
-                    disconnectedBufferOptions.setPersistBuffer(false);
-                    disconnectedBufferOptions.setDeleteOldestMessages(false);
-                    mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
-
-                    subscribeTopics();
-                }
-
-                @Override
-                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Log.d(TAG, "Failed to connect : " + exception.getMessage());
-                }
-            });
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-    }
+//    private void mqttConnect() {
+//        Log.d(TAG, "Connecting with username : " + username + " & password : " + password + " to "+ broker);
+//
+//        try {
+//            mqttAndroidClient.connect(mqttConnectOptions, null, new IMqttActionListener() {
+//                @Override
+//                public void onSuccess(IMqttToken asyncActionToken) {
+//                    Log.d(TAG, "Successfully connected");
+//
+//                    DisconnectedBufferOptions disconnectedBufferOptions = new DisconnectedBufferOptions();
+//                    disconnectedBufferOptions.setBufferEnabled(true);
+//                    disconnectedBufferOptions.setBufferSize(100);
+//                    disconnectedBufferOptions.setPersistBuffer(false);
+//                    disconnectedBufferOptions.setDeleteOldestMessages(false);
+//                    mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
+//
+//                    subscribeTopics();
+//                }
+//
+//                @Override
+//                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+//                    Log.d(TAG, "Failed to connect : " + exception.getMessage());
+//                }
+//            });
+//        } catch (MqttException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     private Class getMainActivityClass(Context context) {
         String packageName = context.getPackageName();
@@ -444,21 +461,21 @@ public class SamService extends Service {
         }
     }
 
-    private void subscribeTopics() {
-        try {
-            mqttAndroidClient.subscribe(topics, qoss, null, new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.d(TAG, "Successfully subscribed");
-                }
-
-                @Override
-                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-
-                }
-            });
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-    }
+//    private void subscribeTopics() {
+//        try {
+//            mqttAndroidClient.subscribe(topics, qoss, null, new IMqttActionListener() {
+//                @Override
+//                public void onSuccess(IMqttToken asyncActionToken) {
+//                    Log.d(TAG, "Successfully subscribed");
+//                }
+//
+//                @Override
+//                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+//
+//                }
+//            });
+//        } catch (MqttException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }
