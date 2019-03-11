@@ -23,6 +23,7 @@ import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -145,8 +146,8 @@ public class SamService extends Service {
 
     private void initMqttOptions() {
         mqttConnectOptions = new MqttConnectOptions();
-        mqttConnectOptions.setCleanSession(true);
-        mqttConnectOptions.setAutomaticReconnect(true);
+//        mqttConnectOptions.setCleanSession(true);
+//        mqttConnectOptions.setAutomaticReconnect(true);
         mqttConnectOptions.setUserName(username);
         mqttConnectOptions.setPassword(password.toCharArray());
 
@@ -164,7 +165,24 @@ public class SamService extends Service {
     private void initMqttClient() {
         Log.d(TAG, "initiating");
         mqttAndroidClient = new MqttAndroidClient(this, broker, MqttClient.generateClientId() );
-        mqttAndroidClient.setCallback(new MqttCallbackExtended() {
+        mqttAndroidClient.setCallback(new MqttCallback() {
+            @Override
+            public void connectionLost(Throwable cause) {
+                Log.d(TAG, "The Connection was lost. " + cause.getMessage());
+            }
+
+            @Override
+            public void messageArrived(String topic, MqttMessage message) throws Exception {
+                String msg = new String(message.getPayload());
+                onMessageReceived(topic, getPayload(msg));
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken token) {
+                Log.d(TAG, "deliveryComplete");
+            }
+        });
+        /*mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean reconnect, String serverURI) {
                 if (reconnect) {
@@ -192,7 +210,7 @@ public class SamService extends Service {
             public void deliveryComplete(IMqttDeliveryToken token) {
                 Log.d(TAG, "deliveryComplete");
             }
-        });
+        });*/
     }
 
     private MqttPayload getPayload(String message) {
