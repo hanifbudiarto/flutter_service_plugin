@@ -97,6 +97,7 @@ public class SamService extends Service {
             Log.d(TAG, "user is null");
         }
 
+        /*
         MqttConnectOptions cobaMqttConnectOptions = new MqttConnectOptions();
         cobaMqttConnectOptions.setCleanSession(true);
         cobaMqttConnectOptions.setAutomaticReconnect(true);
@@ -179,17 +180,17 @@ public class SamService extends Service {
         } catch (MqttException e) {
             e.printStackTrace();
         }
+        */
 
+        // so initialize mqtt client object and its options
+        initMqttOptions();
+        initMqttClient();
 
-//        // so initialize mqtt client object and its options
-//        initMqttOptions();
-//        initMqttClient();
-//
-//        // get topics from database
-//        loadMqttTopics();
-//
-//        // connect to broker
-//        mqttConnect();
+        // get topics from database
+        loadMqttTopics();
+
+        // connect to broker
+        mqttConnect();
         return Service.START_STICKY;
     }
 
@@ -229,8 +230,6 @@ public class SamService extends Service {
 
     }
 
-
-    // no problem
     private void initMqttOptions() {
         mqttConnectOptions = new MqttConnectOptions();
         mqttConnectOptions.setCleanSession(true);
