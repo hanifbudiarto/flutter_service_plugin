@@ -89,6 +89,11 @@ public class SamService extends Service {
             broker = "ssl://" + user.getBroker() + ":8883";
             username = user.getApiKey();
             password = user.getApiToken();
+
+            Log.d(TAG, "onStartCommand : " + broker + " with " + username + " and " + password);
+        }
+        else {
+            Log.d(TAG, "user is null");
         }
 
         // so initialize mqtt client object and its options
@@ -113,11 +118,6 @@ public class SamService extends Service {
     @Override
     public void onDestroy() {
         if (mqttAndroidClient != null) {
-            try {
-                mqttAndroidClient.unsubscribe("#");
-            } catch (MqttException e) {
-                e.printStackTrace();
-            }
             mqttAndroidClient.unregisterResources();
             mqttAndroidClient.close();
         }
