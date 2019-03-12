@@ -5,12 +5,17 @@ public class MqttNotification {
     private String resourceId;
     private String topic;
     private MqttOption option;
+    private String deviceName;
+    private String analyticTitle;
 
-    public MqttNotification(String analyticId, String resourceId, String topic, MqttOption option) {
+    public MqttNotification(String analyticId, String resourceId, String topic, MqttOption option,
+                            String deviceName, String analyticTitle) {
         this.analyticId = analyticId;
         this.resourceId = resourceId;
         this.topic = topic;
         this.option = option;
+        this.deviceName = deviceName;
+        this.analyticTitle = analyticTitle;
     }
 
     public String getAnalyticId() {
@@ -43,5 +48,21 @@ public class MqttNotification {
 
     public void setOption(MqttOption option) {
         this.option = option;
+    }
+
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
+    }
+
+    public String getAnalyticTitle() {
+        return analyticTitle;
+    }
+
+    public void setAnalyticTitle(String analyticTitle) {
+        this.analyticTitle = analyticTitle;
     }
 }

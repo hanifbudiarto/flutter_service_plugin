@@ -5,9 +5,9 @@ import java.util.Date;
 public class MqttPayload {
 
     private Date datetime;
-    private double value;
+    private String value;
 
-    public MqttPayload(Date datetime, double value) {
+    public MqttPayload(Date datetime, String value) {
         this.datetime = datetime;
         this.value = value;
     }
@@ -20,11 +20,11 @@ public class MqttPayload {
         this.datetime = datetime;
     }
 
-    public double getValue() {
+    public String getValue() {
         return value;
     }
 
-    public void setValue(double value) {
+    public void setValue(String value) {
         this.value = value;
     }
 }

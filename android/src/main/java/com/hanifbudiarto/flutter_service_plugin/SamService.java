@@ -173,8 +173,10 @@ public class SamService extends Service {
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
+                MqttNotification notification = dbHelper.getNotificationsByTopic(topic);
+
                 String msg = new String(message.getPayload());
-                onMessageReceived(topic, getPayload(msg));
+                onMessageReceived(notification, getPayload(msg));
             }
 
             @Override
@@ -192,7 +194,7 @@ public class SamService extends Service {
                 String[] splitted = message.split(";");
 
                 if (splitted.length >= 2) {
-                    payload = new MqttPayload(formatter.parse(splitted[0]), Double.parseDouble(splitted[1]));
+                    payload = new MqttPayload(formatter.parse(splitted[0]), splitted[1]);
                 }
 
             } catch (Exception e) {
@@ -204,43 +206,47 @@ public class SamService extends Service {
         return payload;
     }
 
-    private void onMessageReceived(String topic, MqttPayload payload) {
+    private void onMessageReceived(MqttNotification notification, MqttPayload payload) {
         if (payload == null) return;
 
         Log.d(TAG, "Incoming message: " + payload.getValue());
 
-        MqttNotification notification = dbHelper.getNotificationsByTopic(topic);
         boolean isExceedThreshold = exceedThreshold(
                 payload.getValue(),
                 notification.getOption().getRule(),
                 notification.getOption().getThreshold());
         if (isExceedThreshold) {
             if (notification.getOption().isNotify()) {
-                showNotification(topic, buildMessage(notification, payload.getValue()));
+                showNotification(notification.getTopic(), buildMessage(notification, payload.getValue()));
             }
 
             if (notification.getOption().isAlert()) {
-                launchAlarmActivity(topic, buildMessage(notification, payload.getValue()));
+                launchAlarmActivity(notification.getTopic(), buildMessage(notification, payload.getValue()));
             }
         }
     }
 
-    private boolean exceedThreshold(double value, String rule, double threshold) {
+    private boolean exceedThreshold(String value, String rule, double threshold) {
+        if (rule.equals("#")) {
+            // boolean datatype
+            return Boolean.parseBoolean(value) == (threshold == 1);
+        }
+
         switch (rule) {
             case ">" :
-                return value > threshold;
+                return Double.parseDouble(value) > threshold;
             case "<" :
-                return value < threshold;
+                return Double.parseDouble(value) < threshold;
             case "=" :
-                return value == threshold;
+                return Double.parseDouble(value) == threshold;
             default:
                 return false;
         }
     }
 
-    private String buildMessage(MqttNotification notification, double value) {
+    private String buildMessage(MqttNotification notification, String value) {
         if (notification != null) {
-            return "Analytic ID ini " + notification.getAnalyticId() + " "
+            return "Perangkat " + notification.getDeviceName() + " pada analitik " + notification.getAnalyticTitle() + " mempunyai nilai "
                     + notification.getOption().getRule() + " "
                     + notification.getOption().getThreshold()
                     + " nilainya segini " + value;
@@ -353,6 +359,9 @@ public class SamService extends Service {
                     @Override
                     public void onSuccess(IMqttToken asyncActionToken) {
                         Log.d(TAG, "Successfully subscribed");
+                        for(String topic : topics) {
+                            Log.d(TAG, "topic : " + topic);
+                        }
                     }
 
                     @Override
