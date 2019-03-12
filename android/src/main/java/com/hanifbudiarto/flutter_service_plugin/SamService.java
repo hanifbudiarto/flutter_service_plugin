@@ -101,11 +101,9 @@ public class SamService extends Service {
         initMqttOptions();
         initMqttClient();
 
-        // get topics from database
-        loadMqttTopics();
-
         // connect to broker
         mqttConnect();
+
         return Service.START_STICKY;
     }
 
@@ -147,6 +145,7 @@ public class SamService extends Service {
 
     private void initMqttOptions() {
         mqttConnectOptions = new MqttConnectOptions();
+        mqttConnectOptions.setCleanSession(true);
         mqttConnectOptions.setAutomaticReconnect(true);
         mqttConnectOptions.setUserName(username);
         mqttConnectOptions.setPassword(password.toCharArray());
@@ -168,14 +167,9 @@ public class SamService extends Service {
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean reconnect, String serverURI) {
-                if (reconnect) {
-                    Log.d(TAG, "hasil reconnect to "+ broker);
-                    Log.d(TAG, "tadi reconnect with username : " + username + " & password : " + password + " to "+ broker);
-                    subscribeTopics();
-                }
-                else {
-                    Log.d(TAG, "dah connected to "+ broker);
-                }
+                // get topics from database
+                loadMqttTopics();
+                subscribeTopics();
             }
 
             @Override
