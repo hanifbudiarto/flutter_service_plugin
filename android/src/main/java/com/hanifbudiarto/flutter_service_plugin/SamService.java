@@ -145,7 +145,6 @@ public class SamService extends Service {
 
     private void initMqttOptions() {
         mqttConnectOptions = new MqttConnectOptions();
-        mqttConnectOptions.setCleanSession(true);
         mqttConnectOptions.setAutomaticReconnect(true);
         mqttConnectOptions.setUserName(username);
         mqttConnectOptions.setPassword(password.toCharArray());
@@ -164,14 +163,7 @@ public class SamService extends Service {
     private void initMqttClient() {
         Log.d(TAG, "initiating");
         mqttAndroidClient = new MqttAndroidClient(this, broker, MqttClient.generateClientId() );
-        mqttAndroidClient.setCallback(new MqttCallbackExtended() {
-            @Override
-            public void connectComplete(boolean reconnect, String serverURI) {
-                // get topics from database
-                loadMqttTopics();
-                subscribeTopics();
-            }
-
+        mqttAndroidClient.setCallback(new MqttCallback() {
             @Override
             public void connectionLost(Throwable cause) {
                 Log.d(TAG, "The Connection was lost. " + cause.getMessage());
@@ -319,15 +311,15 @@ public class SamService extends Service {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.d(TAG, "Successfully connected");
-//
-//                    DisconnectedBufferOptions disconnectedBufferOptions = new DisconnectedBufferOptions();
-//                    disconnectedBufferOptions.setBufferEnabled(true);
-//                    disconnectedBufferOptions.setBufferSize(100);
-//                    disconnectedBufferOptions.setPersistBuffer(false);
-//                    disconnectedBufferOptions.setDeleteOldestMessages(false);
-//                    mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
-//
-//                    subscribeTopics();
+
+                    DisconnectedBufferOptions disconnectedBufferOptions = new DisconnectedBufferOptions();
+                    disconnectedBufferOptions.setBufferEnabled(true);
+                    disconnectedBufferOptions.setBufferSize(100);
+                    disconnectedBufferOptions.setPersistBuffer(false);
+                    disconnectedBufferOptions.setDeleteOldestMessages(false);
+                    mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
+
+                    subscribeTopics();
                 }
 
                 @Override
@@ -354,17 +346,19 @@ public class SamService extends Service {
 
     private void subscribeTopics() {
         try {
-            mqttAndroidClient.subscribe(topics, qoss, null, new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.d(TAG, "Successfully subscribed");
-                }
+            if (topics != null && topics.length > 0 && qoss != null && qoss.length > 0) {
+                mqttAndroidClient.subscribe(topics, qoss, null, new IMqttActionListener() {
+                    @Override
+                    public void onSuccess(IMqttToken asyncActionToken) {
+                        Log.d(TAG, "Successfully subscribed");
+                    }
 
-                @Override
-                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Log.d(TAG, "Gagal subscribed " + exception.getMessage());
-                }
-            });
+                    @Override
+                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                        Log.d(TAG, "Gagal subscribed " + exception.getMessage());
+                    }
+                });
+            }
         } catch (MqttException e) {
             e.printStackTrace();
         }
