@@ -41,6 +41,7 @@ import java.security.cert.CertificateException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -201,6 +202,9 @@ public class SamService extends Service {
                 e.printStackTrace();
             }
 
+        }
+        else {
+            payload = new MqttPayload(Calendar.getInstance().getTime(), message);
         }
 
         return payload;
