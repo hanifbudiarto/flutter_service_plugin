@@ -101,6 +101,8 @@ public class SamService extends Service {
         initMqttOptions();
         initMqttClient();
 
+        loadMqttTopics();
+
         // connect to broker
         mqttConnect();
 
