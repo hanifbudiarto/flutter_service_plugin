@@ -22,8 +22,6 @@ public class AlarmActivity extends AppCompatActivity {
     private String message, title, device;
     private Button btnClose;
 
-    private boolean firstShown = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,28 +56,17 @@ public class AlarmActivity extends AppCompatActivity {
         btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                onClose();
             }
         });
-
-        firstShown = true;
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+    private void onClose() {
+        finish();
+        Intent intent = new Intent(this, getMainActivityClass(this));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
 
-        if (!firstShown) {
-            Intent intent = new Intent(this, getMainActivityClass(this));
-            finish();
-            startActivity(intent);
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        firstShown = false;
-        super.onStop();
     }
 
     private Class getMainActivityClass(Context context) {
