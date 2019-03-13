@@ -225,7 +225,7 @@ public class SamService extends Service {
             }
 
             if (notification.getOption().isAlert()) {
-                launchAlarmActivity(notification, buildMessage(notification, payload.getValue()));
+                launchAlarmActivity(notification, payload.getValue());
             }
         }
     }
