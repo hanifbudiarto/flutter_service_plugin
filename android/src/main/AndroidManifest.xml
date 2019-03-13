@@ -12,7 +12,7 @@
 
     <application android:name="io.flutter.app.FlutterApplication">
         <activity android:name=".AlarmActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:showOnLockScreen="true" android:turnScreenOn="true" android:noHistory="true"/>
+            android:showOnLockScreen="true" android:turnScreenOn="true" android:noHistory="true" android:excludeFromRecents="true"/>
 
         <service android:name="org.eclipse.paho.android.service.MqttService" />
         <service android:name=".SamService" />
