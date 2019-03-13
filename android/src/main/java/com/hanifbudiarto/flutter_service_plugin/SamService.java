@@ -225,7 +225,7 @@ public class SamService extends Service {
             }
 
             if (notification.getOption().isAlert()) {
-                launchAlarmActivity(notification.getTopic(), buildMessage(notification, payload.getValue()));
+                launchAlarmActivity(notification, buildMessage(notification, payload.getValue()));
             }
         }
     }
@@ -248,22 +248,39 @@ public class SamService extends Service {
         }
     }
 
+    private String getComparisonString(String comp) {
+        switch (comp) {
+            case ">": return "bigger than";
+            case "<" : return "lower than";
+            case "=" : return "equals";
+        }
+
+        return "";
+    }
+
     private String buildMessage(MqttNotification notification, String value) {
         if (notification != null) {
-            return "Perangkat " + notification.getDeviceName() + " pada analitik " + notification.getAnalyticTitle() + " mempunyai nilai "
-                    + notification.getOption().getRule() + " "
-                    + notification.getOption().getThreshold()
-                    + " nilainya segini " + value;
+            if (notification.getOption().getRule().equals("#")) {
+                return notification.getDeviceName() + " (" + notification.getAnalyticTitle().toUpperCase()
+                        + ") equals " + value.toUpperCase();
+            }
+            else {
+                return notification.getDeviceName() + " (" + notification.getAnalyticTitle().toUpperCase() + ") equals " + value + " "
+                        + " ( " +getComparisonString(notification.getOption().getRule()) + " "
+                        + notification.getOption().getThreshold() + " )";
+            }
         }
         return "";
     }
 
-    private void launchAlarmActivity(String topic, String message) {
+    private void launchAlarmActivity(MqttNotification notification, String message) {
         Intent secondIntent = new Intent(this, AlarmActivity.class);
 
         Bundle extras = new Bundle();
-        extras.putString(AlarmActivity.EXTRA_TOPIC, topic);
+        extras.putString(AlarmActivity.EXTRA_TOPIC, notification.getTopic());
         extras.putString(AlarmActivity.EXTRA_MESSAGE, message);
+        extras.putString(AlarmActivity.EXTRA_TITLE, notification.getAnalyticTitle());
+        extras.putString(AlarmActivity.EXTRA_DEVICE, notification.getDeviceName());
 
         secondIntent.putExtras(extras);
 
@@ -287,7 +304,8 @@ public class SamService extends Service {
                     // Set the intent that will fire when the user taps the notification
                     .setContentIntent(pendingIntent)
                     .setVibrate(new long[] {1000, 1000, 1000})
-                    .setAutoCancel(true);
+                    .setAutoCancel(true)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(message));
 
             // set notification logo
             if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
