@@ -284,7 +284,7 @@ public class SamService extends Service {
 
         secondIntent.putExtras(extras);
 
-        secondIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        secondIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
         startActivity(secondIntent);
     }
 
