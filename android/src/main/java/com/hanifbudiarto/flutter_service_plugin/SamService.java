@@ -74,11 +74,14 @@ public class SamService extends Service {
     // util
     private SimpleDateFormat formatter;
 
+    private NotificationHelper notificationHelper;
+
     // onCreate will be executed only once on a lifetime
     @Override
     public void onCreate() {
         super.onCreate();
 
+        notificationHelper = new NotificationHelper(this);
         dbHelper  = new DatabaseHelper(this);
         formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     }
@@ -290,46 +293,7 @@ public class SamService extends Service {
 
     private void showNotification(String topic, String message) {
         Log.d(TAG, "Trying to show notification");
-
-        try {
-            // Create an explicit intent for an Activity in your app
-            Intent intent = new Intent(this, getMainActivityClass(this));
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                    .setContentTitle("SAM IoT")
-                    .setContentText(message)
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    // Set the intent that will fire when the user taps the notification
-                    .setContentIntent(pendingIntent)
-                    .setVibrate(new long[] {1000, 1000, 1000})
-                    .setAutoCancel(true)
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText(message));
-
-            // set notification logo
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                builder.setSmallIcon(R.drawable.ic_stat_logo_white_trans);
-                builder.setColor(Color.parseColor("#FF3F51B5"));
-            } else {
-                builder.setSmallIcon(R.drawable.ic_stat_logo_white_trans);
-            }
-
-            // set notification ringtone
-            Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            builder.setSound(alarmSound);
-
-            // unique notification id
-            BigInteger id = new BigInteger(topic.getBytes());
-
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-
-            // notificationId is a unique int for each notification that you must define
-            notificationManager.notify(id.intValue(), builder.build());
-        }
-        catch(Exception e) {
-            Log.d(TAG, e.getMessage());
-        }
+        notificationHelper.createNotification(topic, "SAM IotT", message);
         Log.d(TAG, "End notification");
     }
 
