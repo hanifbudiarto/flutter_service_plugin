@@ -1,17 +1,10 @@
 package com.hanifbudiarto.flutter_service_plugin;
 
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.hanifbudiarto.flutter_service_plugin.model.MqttNotification;
@@ -19,12 +12,9 @@ import com.hanifbudiarto.flutter_service_plugin.model.MqttPayload;
 import com.hanifbudiarto.flutter_service_plugin.model.User;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -32,31 +22,37 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 public class SamService extends Service {
+    // error tag
     private final String TAG = getClass().getSimpleName();
 
-    // MQTT Broker
-    private String broker = "somewhere_broker";
-    private final String NOTIFICATION_CHANNEL_ID = "SAM_Notification_Channel_ID";
+    private final String NOTIFICATION_TITLE = "SAM IoT";
+
+    // reconnect and clean session variable for mqtt connect options
+    private final boolean RECONNECT = true;
+    private final boolean CLEAN_SESSION = true;
+
+    // default MQTT QoS
     private final int DEFAULT_QOS = 0;
 
+    // MQTT Broker
+    // because broker can be changed sometimes
+    // and programmer don't want to deal with changing it every time.
+    // broker is saved in SQLite database from flutter main application
+    private String broker = "somewhere_broker";
+
+    // we also save the username and password for this broker
     private String username = "someone_username";
     private String password = "someone_password";
 
@@ -68,26 +64,18 @@ public class SamService extends Service {
     private String[] topics;
     private int[] qoss;
 
-    // database helper to load topics
+    // database helper to load topics, broker address etc.
     private DatabaseHelper dbHelper;
 
-    // util
+    // utility class for converting date format
     private SimpleDateFormat formatter;
 
+    // now notification has its own class
     private NotificationHelper notificationHelper;
 
-    // onCreate will be executed only once on a lifetime
-    @Override
-    public void onCreate() {
-        super.onCreate();
+    private NetworkChangeReceiver networkChangeReceiver;
 
-        notificationHelper = new NotificationHelper(this);
-        dbHelper  = new DatabaseHelper(this);
-        formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    private void initBrokerAndAuth() {
         User user = dbHelper.getUser();
 
         if (user != null) {
@@ -100,61 +88,16 @@ public class SamService extends Service {
         else {
             Log.d(TAG, "user is null");
         }
-
-        // so initialize mqtt client object and its options
-        initMqttOptions();
-        initMqttClient();
-
-        loadMqttTopics();
-
-        // connect to broker
-        mqttConnect();
-
-        return Service.START_STICKY;
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        // method not used
-        return null;
-    }
-
-    @Override
-    public void onDestroy() {
-        if (mqttAndroidClient != null) {
-            mqttAndroidClient.unregisterResources();
-            mqttAndroidClient.close();
-        }
-
-        super.onDestroy();
-    }
-
-    private void loadMqttTopics() {
-        Log.d(TAG, "loading topics");
-
-        List<MqttNotification> notifications = dbHelper.getNotifications();
-        int size = notifications.size();
-
-        topics = new String[size];
-        qoss = new int[size];
-
-        int index = 0;
-        for(MqttNotification notification : notifications) {
-            topics[index] = notification.getTopic();
-            qoss[index] = DEFAULT_QOS;
-
-            index++;
-        }
-
     }
 
     private void initMqttOptions() {
         mqttConnectOptions = new MqttConnectOptions();
-        mqttConnectOptions.setAutomaticReconnect(true);
+        mqttConnectOptions.setAutomaticReconnect(RECONNECT);
+        mqttConnectOptions.setCleanSession(CLEAN_SESSION);
         mqttConnectOptions.setUserName(username);
         mqttConnectOptions.setPassword(password.toCharArray());
 
+        // load certificate file if this broker connect via secure ssl
         if (broker.contains("ssl")) {
             SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();
             try {
@@ -169,7 +112,19 @@ public class SamService extends Service {
     private void initMqttClient() {
         Log.d(TAG, "initiating");
         mqttAndroidClient = new MqttAndroidClient(this, broker, MqttClient.generateClientId() );
-        mqttAndroidClient.setCallback(new MqttCallback() {
+        mqttAndroidClient.setCallback(new MqttCallbackExtended() {
+            @Override
+            public void connectComplete(boolean reconnect, String serverURI) {
+                if (reconnect) {
+                    Log.e(TAG, "Reconnected");
+                }
+                else {
+                    Log.e(TAG, "Connected");
+                }
+
+                subscribe();
+            }
+
             @Override
             public void connectionLost(Throwable cause) {
                 Log.d(TAG, "The Connection was lost. " + cause.getMessage());
@@ -190,15 +145,140 @@ public class SamService extends Service {
         });
     }
 
+    private void initTopics() {
+        Log.d(TAG, "loading topics");
+
+        List<MqttNotification> notifications = dbHelper.getNotifications();
+        int size = notifications.size();
+
+        topics = new String[size];
+        qoss = new int[size];
+
+        int index = 0;
+        for(MqttNotification notification : notifications) {
+            topics[index] = notification.getTopic();
+            qoss[index] = DEFAULT_QOS;
+
+            index++;
+        }
+    }
+
+    // subscribe to broker
+    private void subscribe() {
+        try {
+            if (topics != null && topics.length > 0 && qoss != null && qoss.length > 0) {
+                mqttAndroidClient.subscribe(topics, qoss, null, new IMqttActionListener() {
+                    @Override
+                    public void onSuccess(IMqttToken asyncActionToken) {
+                        Log.d(TAG, "Successfully subscribed");
+                        for(String topic : topics) {
+                            Log.d(TAG, "topic : " + topic);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                        Log.d(TAG, "Failed to subscribe " + exception.getMessage());
+                    }
+                });
+            }
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void connect() {
+        Thread connectThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "Connecting with username : " + username + " & password : " + password + " to "+ broker);
+
+                try {
+                    mqttAndroidClient.connect(mqttConnectOptions, null, new IMqttActionListener() {
+                        @Override
+                        public void onSuccess(IMqttToken asyncActionToken) {
+                            Log.d(TAG, "Successfully connected");
+                        }
+
+                        @Override
+                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                            Log.d(TAG, "Failed to connect : " + exception.getMessage());
+                        }
+                    });
+                } catch (MqttException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        connectThread.run();
+    }
+
+    // onCreate will be executed only once on a lifetime
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        // initialize helper class
+        notificationHelper = new NotificationHelper(this);
+        dbHelper  = new DatabaseHelper(this);
+        formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("android.intent.action.BOOT_COMPLETED");
+        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        networkChangeReceiver = new NetworkChangeReceiver();
+
+        registerReceiver(networkChangeReceiver, intentFilter);
+    }
+
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        // initialize MQTT core elements
+        initBrokerAndAuth();
+        initMqttOptions();
+        initMqttClient();
+        initTopics();
+
+        // connecting
+        connect();
+
+        return Service.START_STICKY;
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        // method not used
+        return null;
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mqttAndroidClient != null) {
+            mqttAndroidClient.unregisterResources();
+            mqttAndroidClient.close();
+        }
+
+        unregisterReceiver(networkChangeReceiver);
+
+        super.onDestroy();
+    }
+
+    // splitting string resulted from mqtt received
+    // for value result, contains datetime. (<datetime>;<value>)
+    // for boolean result, only value (true or false)
     private MqttPayload getPayload(String message) {
         MqttPayload payload = null;
 
         if (message.contains(";")) {
             try {
-                String[] splitted = message.split(";");
+                String[] separatedMessage = message.split(";");
 
-                if (splitted.length >= 2) {
-                    payload = new MqttPayload(formatter.parse(splitted[0]), splitted[1]);
+                if (separatedMessage.length >= 2) {
+                    payload = new MqttPayload(formatter.parse(separatedMessage[0]), separatedMessage[1]);
                 }
 
             } catch (Exception e) {
@@ -224,7 +304,7 @@ public class SamService extends Service {
                 notification.getOption().getThreshold());
         if (isExceedThreshold) {
             if (notification.getOption().isNotify()) {
-                showNotification(notification.getTopic(), buildMessage(notification, payload.getValue()));
+                showNotification(notification, payload.getValue());
             }
 
             if (notification.getOption().isAlert()) {
@@ -261,6 +341,7 @@ public class SamService extends Service {
         return "";
     }
 
+    // build message for notification message on notification bar/action bar
     private String buildMessage(MqttNotification notification, String value) {
         if (notification != null) {
             if (notification.getOption().getRule().equals("#")) {
@@ -276,12 +357,11 @@ public class SamService extends Service {
         return "";
     }
 
-    private void launchAlarmActivity(MqttNotification notification, String message) {
+    private void launchAlarmActivity(MqttNotification notification, String valueReceived) {
         Intent secondIntent = new Intent(this, AlarmActivity.class);
 
         Bundle extras = new Bundle();
-        extras.putString(AlarmActivity.EXTRA_TOPIC, notification.getTopic());
-        extras.putString(AlarmActivity.EXTRA_MESSAGE, message);
+        extras.putString(AlarmActivity.EXTRA_VALUE, valueReceived);
         extras.putString(AlarmActivity.EXTRA_TITLE, notification.getAnalyticTitle());
         extras.putString(AlarmActivity.EXTRA_DEVICE, notification.getDeviceName());
 
@@ -291,73 +371,12 @@ public class SamService extends Service {
         startActivity(secondIntent);
     }
 
-    private void showNotification(String topic, String message) {
+    private void showNotification(MqttNotification notification, String valueReceived) {
         Log.d(TAG, "Trying to show notification");
-        notificationHelper.createNotification(topic, "SAM IotT", message);
+        String topic = notification.getTopic();
+        String message = buildMessage(notification, valueReceived);
+
+        notificationHelper.createNotification(topic, NOTIFICATION_TITLE, message);
         Log.d(TAG, "End notification");
-    }
-
-    private void mqttConnect() {
-        Log.d(TAG, "Connecting with username : " + username + " & password : " + password + " to "+ broker);
-
-        try {
-            mqttAndroidClient.connect(mqttConnectOptions, null, new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.d(TAG, "Successfully connected");
-
-                    DisconnectedBufferOptions disconnectedBufferOptions = new DisconnectedBufferOptions();
-                    disconnectedBufferOptions.setBufferEnabled(true);
-                    disconnectedBufferOptions.setBufferSize(100);
-                    disconnectedBufferOptions.setPersistBuffer(false);
-                    disconnectedBufferOptions.setDeleteOldestMessages(false);
-                    mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
-
-                    subscribeTopics();
-                }
-
-                @Override
-                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Log.d(TAG, "Failed to connect mqttConnect : " + exception.getMessage());
-                }
-            });
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private Class getMainActivityClass(Context context) {
-        String packageName = context.getPackageName();
-        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
-        String className = launchIntent.getComponent().getClassName();
-        try {
-            return Class.forName(className);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private void subscribeTopics() {
-        try {
-            if (topics != null && topics.length > 0 && qoss != null && qoss.length > 0) {
-                mqttAndroidClient.subscribe(topics, qoss, null, new IMqttActionListener() {
-                    @Override
-                    public void onSuccess(IMqttToken asyncActionToken) {
-                        Log.d(TAG, "Successfully subscribed");
-                        for(String topic : topics) {
-                            Log.d(TAG, "topic : " + topic);
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                        Log.d(TAG, "Gagal subscribed " + exception.getMessage());
-                    }
-                });
-            }
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
     }
 }

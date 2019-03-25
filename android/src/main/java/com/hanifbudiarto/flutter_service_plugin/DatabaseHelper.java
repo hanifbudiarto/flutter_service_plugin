@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.gson.Gson;
+import com.hanifbudiarto.flutter_service_plugin.model.AppSettings;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttNotification;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttOption;
 import com.hanifbudiarto.flutter_service_plugin.model.User;
@@ -137,4 +138,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return notifications;
     }
+
+    AppSettings getAppSettings() {
+        AppSettings appSettings = null;
+
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+            String selectQuery = "select app_theme from app_settings";
+
+            Cursor cursor = db.rawQuery(selectQuery, null);
+
+            // looping through all rows and adding to list
+            if (cursor.moveToFirst()) {
+                do {
+                    appSettings = new AppSettings(cursor.getString(0));
+                } while (cursor.moveToNext());
+            }
+
+            // close cursor
+            cursor.close();
+
+            // close db connection
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return appSettings;
+    }
+
 }
