@@ -21,7 +21,7 @@ class _MyAppState extends State<MyApp> {
         body: Center(
           child: RaisedButton(onPressed: () async {
             try {
-              FlutterServicePlugin.startService();
+              FlutterServicePlugin.restartService();
             }
             catch (e) {
               print(e.toString());

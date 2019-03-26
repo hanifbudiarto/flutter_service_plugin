@@ -1,4 +1,4 @@
-package com.hanifbudiarto.flutter_service_plugin;
+package com.hanifbudiarto.flutter_service_plugin.util;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -8,6 +8,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.provider.Settings;
+
+import com.hanifbudiarto.flutter_service_plugin.R;
+import com.hanifbudiarto.flutter_service_plugin.util.FlutterUtil;
 
 import java.math.BigInteger;
 

@@ -1,4 +1,4 @@
-package com.hanifbudiarto.flutter_service_plugin;
+package com.hanifbudiarto.flutter_service_plugin.service;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

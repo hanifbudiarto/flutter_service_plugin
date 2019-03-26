@@ -1,4 +1,4 @@
-package com.hanifbudiarto.flutter_service_plugin;
+package com.hanifbudiarto.flutter_service_plugin.service;
 
 import android.app.Service;
 import android.content.Intent;
@@ -7,9 +7,14 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.hanifbudiarto.flutter_service_plugin.screen.AlarmActivity;
+import com.hanifbudiarto.flutter_service_plugin.R;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttNotification;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttPayload;
 import com.hanifbudiarto.flutter_service_plugin.model.User;
+import com.hanifbudiarto.flutter_service_plugin.util.DatabaseHelper;
+import com.hanifbudiarto.flutter_service_plugin.util.NotificationHelper;
+import com.hanifbudiarto.flutter_service_plugin.util.SocketFactory;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -72,8 +77,6 @@ public class SamService extends Service {
 
     // now notification has its own class
     private NotificationHelper notificationHelper;
-
-    private NetworkChangeReceiver networkChangeReceiver;
 
     private void initBrokerAndAuth() {
         User user = dbHelper.getUser();
@@ -224,13 +227,6 @@ public class SamService extends Service {
         notificationHelper = new NotificationHelper(this);
         dbHelper  = new DatabaseHelper(this);
         formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("android.intent.action.BOOT_COMPLETED");
-        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-        networkChangeReceiver = new NetworkChangeReceiver();
-
-        registerReceiver(networkChangeReceiver, intentFilter);
     }
 
 
@@ -261,8 +257,6 @@ public class SamService extends Service {
             mqttAndroidClient.unregisterResources();
             mqttAndroidClient.close();
         }
-
-        unregisterReceiver(networkChangeReceiver);
 
         super.onDestroy();
     }

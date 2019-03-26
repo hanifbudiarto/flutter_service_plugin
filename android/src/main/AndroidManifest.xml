@@ -11,11 +11,11 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application android:name="io.flutter.app.FlutterApplication">
-        <activity android:name=".AlarmActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+        <activity android:name=".screen.AlarmActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:showOnLockScreen="true" android:turnScreenOn="true" android:noHistory="true" android:excludeFromRecents="true"/>
 
         <service android:name="org.eclipse.paho.android.service.MqttService" />
-        <service android:name=".SamService" />
+        <service android:name=".service.SamService" />
     </application>
 
 </manifest>

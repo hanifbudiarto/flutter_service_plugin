@@ -2,16 +2,6 @@ package com.hanifbudiarto.flutter_service_plugin.model;
 
 public class User {
 
-    /*
-    *   static const String TABLE_NAME = "user";
-
-  static const String COLUMN_EMAIL = "user_email";
-  static const String COLUMN_PASSWORD = "user_password";
-  static const String COLUMN_API_USERNAME = "api_username";
-  static const String COLUMN_API_PASSWORD = "api_password";
-  static const String COLUMN_API_BROKER = "broker";
-    * */
-
     private String apiKey;
     private String apiToken;
     private String broker;

@@ -1,4 +1,4 @@
-package com.hanifbudiarto.flutter_service_plugin;
+package com.hanifbudiarto.flutter_service_plugin.util;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -35,7 +35,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
 
-    MqttNotification getNotificationsByTopic(String topic) {
+    public MqttNotification getNotificationsByTopic(String topic) {
         MqttNotification notification = null;
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -68,7 +68,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return notification;
     }
 
-    User getUser() {
+    public User getUser() {
         User user = null;
 
         try {
@@ -100,7 +100,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return user;
     }
 
-    List<MqttNotification> getNotifications() {
+    public List<MqttNotification> getNotifications() {
         List<MqttNotification> notifications = new ArrayList<>();
 
         try {
@@ -139,7 +139,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return notifications;
     }
 
-    AppSettings getAppSettings() {
+    public AppSettings getAppSettings() {
         AppSettings appSettings = null;
 
         try {

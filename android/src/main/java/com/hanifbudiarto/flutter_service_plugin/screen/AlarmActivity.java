@@ -1,4 +1,4 @@
-package com.hanifbudiarto.flutter_service_plugin;
+package com.hanifbudiarto.flutter_service_plugin.screen;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,7 +14,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.hanifbudiarto.flutter_service_plugin.R;
 import com.hanifbudiarto.flutter_service_plugin.model.AppSettings;
+import com.hanifbudiarto.flutter_service_plugin.util.DatabaseHelper;
 
 // alarm activity always vibrate and play a ringtone
 public class AlarmActivity extends AppCompatActivity {
