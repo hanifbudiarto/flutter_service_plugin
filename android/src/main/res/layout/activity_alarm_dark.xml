@@ -15,6 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="ALERT"
+        android:gravity="center_horizontal"
         android:layout_gravity="center_horizontal"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
@@ -37,6 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Pemkab Kabupaten Malang"
+        android:gravity="center_horizontal"
         android:textColor="@android:color/white"
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
         android:layout_gravity="center_horizontal" />
@@ -46,18 +48,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Motion Sensor"
+        android:gravity="center_horizontal"
         android:textColor="@android:color/white"
         android:layout_gravity="center_horizontal"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
     <TextView
         android:id="@+id/tvValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
         android:text="TRUE"
-        android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display3"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:textColor="#6c63ff"
         android:textStyle="bold" />
     <Button

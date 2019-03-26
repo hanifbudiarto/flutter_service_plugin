@@ -5,7 +5,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.hanifbudiarto.flutter_service_plugin.model.AppSettings;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttNotification;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttOption;
@@ -17,7 +19,9 @@ import java.util.List;
 import androidx.annotation.Nullable;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    Gson gson = new Gson();
+    Gson gson = new GsonBuilder()
+            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .create();
 
     // Database Version
     private static final int DATABASE_VERSION = 1;

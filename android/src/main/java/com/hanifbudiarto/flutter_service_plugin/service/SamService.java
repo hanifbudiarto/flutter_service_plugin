@@ -369,6 +369,9 @@ public class SamService extends Service {
         Log.d(TAG, "Trying to show notification");
         String topic = notification.getTopic();
         String message = buildMessage(notification, valueReceived);
+        if (notification.getOption().getAddedText() != null && notification.getOption().getAddedText().length() > 0) {
+            message = notification.getOption().getAddedText();
+        }
 
         notificationHelper.createNotification(topic, NOTIFICATION_TITLE, message);
         Log.d(TAG, "End notification");
