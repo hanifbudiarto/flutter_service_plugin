@@ -12,11 +12,6 @@ public class MainActivity extends FlutterActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
-    // starting network change service
-    Intent networkChangeService = new Intent(this, NetworkChangeService.class);
-    startService(networkChangeService);
-
     GeneratedPluginRegistrant.registerWith(this);
   }
 }

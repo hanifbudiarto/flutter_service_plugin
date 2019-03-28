@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.util.Log;
 
+import com.hanifbudiarto.flutter_service_plugin.service.NetworkChangeService;
 import com.hanifbudiarto.flutter_service_plugin.service.SamService;
 
 import io.flutter.plugin.common.MethodCall;
@@ -33,6 +34,11 @@ public class FlutterServicePlugin implements MethodCallHandler {
     switch (call.method) {
       case "restartMqttService":
         restartMqttService();
+        break;
+      case "register":
+        // starting network change service
+        Intent networkChangeService = new Intent(activity, NetworkChangeService.class);
+        activity.startService(networkChangeService);
         break;
       default:
         result.notImplemented();
