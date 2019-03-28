@@ -356,6 +356,10 @@ public class SamService extends Service {
         Intent secondIntent = new Intent(this, AlarmActivity.class);
 
         Bundle extras = new Bundle();
+
+        if (notification.getOption().getText() != null && notification.getOption().getText().length() > 0) {
+            valueReceived = notification.getOption().getText();
+        }
         extras.putString(AlarmActivity.EXTRA_VALUE, valueReceived);
         extras.putString(AlarmActivity.EXTRA_TITLE, notification.getAnalyticTitle());
         extras.putString(AlarmActivity.EXTRA_DEVICE, notification.getDeviceName());
