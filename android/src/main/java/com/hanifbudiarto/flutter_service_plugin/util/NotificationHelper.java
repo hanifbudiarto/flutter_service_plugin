@@ -13,6 +13,7 @@ import com.hanifbudiarto.flutter_service_plugin.R;
 import com.hanifbudiarto.flutter_service_plugin.util.FlutterUtil;
 
 import java.math.BigInteger;
+import java.util.Calendar;
 
 import androidx.core.app.NotificationCompat;
 
@@ -47,6 +48,8 @@ public class NotificationHelper {
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                     .setVibrate(new long[] {1000, 1000, 1000})
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setShowWhen(true)
+                    .setWhen(Calendar.getInstance().getTimeInMillis())
                     .setContentIntent(pendingIntent);
 
             /*
