@@ -5,14 +5,14 @@ public class MqttOption {
     private double threshold;
     private boolean notify;
     private boolean alert;
-    private String addedText;
+    private String text;
 
-    public MqttOption(String rule, double value, boolean notify, boolean alert, String addedText) {
+    public MqttOption(String rule, double value, boolean notify, boolean alert, String text) {
         this.rule = rule;
         this.threshold = value;
         this.notify = notify;
         this.alert = alert;
-        this.addedText = addedText;
+        this.text = text;
     }
 
     public String getRule() {
@@ -47,11 +47,11 @@ public class MqttOption {
         this.alert = alert;
     }
 
-    public String getAddedText() {
-        return addedText;
+    public String getText() {
+        return text;
     }
 
-    public void setAddedText(String addedText) {
-        this.addedText = addedText;
+    public void setText(String text) {
+        this.text = text;
     }
 }

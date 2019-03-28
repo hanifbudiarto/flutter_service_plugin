@@ -297,6 +297,7 @@ public class SamService extends Service {
                 notification.getOption().getRule(),
                 notification.getOption().getThreshold());
         if (isExceedThreshold) {
+
             if (notification.getOption().isNotify()) {
                 showNotification(notification, payload.getValue());
             }
@@ -369,8 +370,8 @@ public class SamService extends Service {
         Log.d(TAG, "Trying to show notification");
         String topic = notification.getTopic();
         String message = buildMessage(notification, valueReceived);
-        if (notification.getOption().getAddedText() != null && notification.getOption().getAddedText().length() > 0) {
-            message = notification.getOption().getAddedText();
+        if (notification.getOption().getText() != null && notification.getOption().getText().length() > 0) {
+            message = notification.getOption().getText();
         }
 
         notificationHelper.createNotification(topic, NOTIFICATION_TITLE, message);

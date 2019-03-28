@@ -19,9 +19,7 @@ import java.util.List;
 import androidx.annotation.Nullable;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    Gson gson = new GsonBuilder()
-            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-            .create();
+    private Gson gson = new Gson();
 
     // Database Version
     private static final int DATABASE_VERSION = 1;
