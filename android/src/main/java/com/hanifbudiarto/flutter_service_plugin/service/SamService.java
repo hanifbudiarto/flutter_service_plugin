@@ -232,14 +232,17 @@ public class SamService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // initialize MQTT core elements
-        initBrokerAndAuth();
-        initMqttOptions();
-        initMqttClient();
-        initTopics();
 
-        // connecting
-        connect();
+        if (mqttAndroidClient == null || !mqttAndroidClient.isConnected()) {
+            // initialize MQTT core elements
+            initBrokerAndAuth();
+            initMqttOptions();
+            initMqttClient();
+            initTopics();
+
+            // connecting
+            connect();
+        }
 
         return Service.START_STICKY;
     }
