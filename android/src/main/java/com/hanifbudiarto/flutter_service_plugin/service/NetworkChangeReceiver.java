@@ -12,18 +12,23 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        boolean online = isOnline(context);
+        try {
+            boolean online = isOnline(context);
 
-        // if not online, stop mqtt service;
-        // if online, start again
-        Intent serviceIntent = new Intent(context, SamService.class);
-        if (online) {
-            Log.d(TAG, "Device online, start service");
-            context.startService(serviceIntent);
+            // if not online, stop mqtt service;
+            // if online, start again
+            Intent serviceIntent = new Intent(context, SamService.class);
+            if (online) {
+                Log.d(TAG, "Device online, start service");
+                context.startService(serviceIntent);
+            } else {
+                Log.d(TAG, "Device offline, stop service");
+                context.stopService(serviceIntent);
+            }
         }
-        else {
-            Log.d(TAG, "Device offline, stop service");
-            context.stopService(serviceIntent);
+        catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
     }
 
