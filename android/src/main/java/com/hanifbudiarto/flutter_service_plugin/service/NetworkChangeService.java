@@ -12,9 +12,6 @@ public class NetworkChangeService extends Service {
 
     private final String TAG = NetworkChangeService.class.getSimpleName();
 
-    private final String ACTION_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED";
-    private final String ACTION_CONN_CHANGE = "android.net.conn.CONNECTIVITY_CHANGE";
-
     private IntentFilter intentFilter;
     private NetworkChangeReceiver networkChangeReceiver;
 
@@ -23,8 +20,10 @@ public class NetworkChangeService extends Service {
         super.onCreate();
 
         intentFilter = new IntentFilter();
-        intentFilter.addAction(ACTION_BOOT_COMPLETED);
-        intentFilter.addAction(ACTION_CONN_CHANGE);
+        String actionBootCompleted = "android.intent.action.BOOT_COMPLETED";
+        intentFilter.addAction(actionBootCompleted);
+        String actionConnectionChange = "android.net.conn.CONNECTIVITY_CHANGE";
+        intentFilter.addAction(actionConnectionChange);
 
         networkChangeReceiver = new NetworkChangeReceiver();
     }

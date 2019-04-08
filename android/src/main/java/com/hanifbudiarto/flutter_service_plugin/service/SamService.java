@@ -2,7 +2,8 @@ package com.hanifbudiarto.flutter_service_plugin.service;
 
 import android.app.Service;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -37,19 +38,13 @@ import java.util.Calendar;
 import java.util.List;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 
 public class SamService extends Service {
     // error tag
     private final String TAG = getClass().getSimpleName();
 
     private final String NOTIFICATION_TITLE = "SAM IoT";
-
-    // reconnect and clean session variable for mqtt connect options
-    private final boolean RECONNECT = true;
-    private final boolean CLEAN_SESSION = true;
-
-    // default MQTT QoS
-    private final int DEFAULT_QOS = 0;
 
     // MQTT Broker
     // because broker can be changed sometimes
@@ -95,8 +90,9 @@ public class SamService extends Service {
 
     private void initMqttOptions() {
         mqttConnectOptions = new MqttConnectOptions();
-        mqttConnectOptions.setAutomaticReconnect(RECONNECT);
-        mqttConnectOptions.setCleanSession(CLEAN_SESSION);
+        // reconnect and clean session variable for mqtt connect options
+        mqttConnectOptions.setAutomaticReconnect(true);
+        mqttConnectOptions.setCleanSession(true);
         mqttConnectOptions.setUserName(username);
         mqttConnectOptions.setPassword(password.toCharArray());
 
@@ -153,6 +149,7 @@ public class SamService extends Service {
 
         List<MqttNotification> notifications = dbHelper.getNotifications();
         int size = notifications.size();
+        int defaultQos = 0;
 
         topics = new String[size];
         qoss = new int[size];
@@ -160,7 +157,7 @@ public class SamService extends Service {
         int index = 0;
         for(MqttNotification notification : notifications) {
             topics[index] = notification.getTopic();
-            qoss[index] = DEFAULT_QOS;
+            qoss[index] = defaultQos;
 
             index++;
         }
@@ -243,6 +240,20 @@ public class SamService extends Service {
             // connecting
             connect();
         }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NotificationHelper.CHANNEL_ID)
+                .setContentTitle(NOTIFICATION_TITLE)
+                .setContentText("Notification and Alert Service")
+                .setOngoing(true);
+        // set notification logo
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setSmallIcon(R.drawable.ic_stat_logo_white_trans);
+            builder.setColor(Color.parseColor("#FF3F51B5"));
+        } else {
+            builder.setSmallIcon(R.drawable.ic_stat_logo_white_trans);
+        }
+
+        startForeground(10001, builder.build());
 
         return Service.START_STICKY;
     }

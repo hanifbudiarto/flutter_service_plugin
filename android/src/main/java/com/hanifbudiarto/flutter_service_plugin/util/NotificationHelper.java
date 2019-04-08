@@ -19,11 +19,9 @@ import androidx.core.app.NotificationCompat;
 
 public class NotificationHelper {
 
-    private final String CHANNEL_ID = "SAMElementNotificationChannelID";
+    public static final String CHANNEL_ID = "SAMElementNotificationChannelID";
 
     private Context context;
-    private NotificationCompat.Builder builder;
-    private NotificationManager notificationManager;
 
     public NotificationHelper(Context context) {
         this.context = context;
@@ -40,7 +38,7 @@ public class NotificationHelper {
             PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
             // create builder
-            builder = new NotificationCompat.Builder(context, CHANNEL_ID);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID);
             builder.setContentTitle(title)
                     .setContentText(message)
                     .setAutoCancel(true)
@@ -66,7 +64,7 @@ public class NotificationHelper {
                 builder.setSmallIcon(R.drawable.ic_stat_logo_white_trans);
             }
 
-            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
             {

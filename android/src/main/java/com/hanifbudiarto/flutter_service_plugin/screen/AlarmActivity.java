@@ -25,12 +25,6 @@ public class AlarmActivity extends AppCompatActivity {
     public static final String EXTRA_TITLE = "title";
     public static final String EXTRA_DEVICE = "device";
 
-    private TextView tvValue, tvTitle, tvDevice;
-    private String value, title, device;
-    private Button btnClose;
-
-    private int REPEAT_VIBRATE = 0;
-
     // Start without a delay
     // Vibrate for 100 milliseconds
     // Sleep for 1000 milliseconds
@@ -39,13 +33,11 @@ public class AlarmActivity extends AppCompatActivity {
     private Vibrator vibrator;
     private MediaPlayer mediaPlayer;
 
-    private DatabaseHelper databaseHelper;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        databaseHelper = new DatabaseHelper(this);
+        DatabaseHelper databaseHelper = new DatabaseHelper(this);
         AppSettings appSettings = databaseHelper.getAppSettings();
 
         int themeId = Integer.parseInt(appSettings.getThemeId());
@@ -77,20 +69,20 @@ public class AlarmActivity extends AppCompatActivity {
         }
 
         // initialize variable from bundle values
-        value = getIntent().getStringExtra(EXTRA_VALUE);
-        title = getIntent().getStringExtra(EXTRA_TITLE);
-        device = getIntent().getStringExtra(EXTRA_DEVICE);
+        String value = getIntent().getStringExtra(EXTRA_VALUE);
+        String title = getIntent().getStringExtra(EXTRA_TITLE);
+        String device = getIntent().getStringExtra(EXTRA_DEVICE);
 
-        tvValue = findViewById(R.id.tvValue);
+        TextView tvValue = findViewById(R.id.tvValue);
         tvValue.setText(value);
 
-        tvDevice = findViewById(R.id.tvDevice);
+        TextView tvDevice = findViewById(R.id.tvDevice);
         tvDevice.setText(device);
 
-        tvTitle = findViewById(R.id.tvTitle);
+        TextView tvTitle = findViewById(R.id.tvTitle);
         tvTitle.setText(title);
 
-        btnClose = findViewById(R.id.btnClose);
+        Button btnClose = findViewById(R.id.btnClose);
         btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,7 +112,8 @@ public class AlarmActivity extends AppCompatActivity {
             // The '0' here means to repeat indefinitely
             // '0' is actually the index at which the pattern keeps repeating from (the start)
             // To repeat the pattern from any other point, you could increase the index, e.g. '1'
-            vibrator.vibrate(VIBRATE_PATTERN, REPEAT_VIBRATE);
+            int repeatVibrate = 0;
+            vibrator.vibrate(VIBRATE_PATTERN, repeatVibrate);
         } catch (Exception e) {
             e.printStackTrace();
         }
