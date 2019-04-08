@@ -284,6 +284,14 @@ public class SamService extends Service {
                 .setContentIntent(pendingIntent)
                 .setOngoing(true);
 
+        // set notification logo
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setSmallIcon(R.drawable.ic_stat_logo_white_trans);
+            builder.setColor(Color.parseColor("#FF3F51B5"));
+        } else {
+            builder.setSmallIcon(R.drawable.ic_stat_logo_white_trans);
+        }
+
         return builder.build();
 
     }
