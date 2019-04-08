@@ -378,12 +378,10 @@ public class SamService extends Service {
     private String buildMessage(MqttNotification notification, String value) {
         if (notification != null) {
             if (notification.getOption().getRule().equals("#")) {
-                return notification.getDeviceName() + " (" + notification.getAnalyticTitle().toUpperCase()
-                        + ") equals " + value.toUpperCase();
+                return value.toUpperCase();
             }
             else {
-                return notification.getDeviceName() + " (" + notification.getAnalyticTitle().toUpperCase() + ") equals " + value + " "
-                        + " ( " +getComparisonString(notification.getOption().getRule()) + " "
+                return value.toUpperCase() +" ( " +getComparisonString(notification.getOption().getRule()) + " "
                         + notification.getOption().getThreshold() + " )";
             }
         }
@@ -416,7 +414,9 @@ public class SamService extends Service {
             message = notification.getOption().getText();
         }
 
-        notificationHelper.createNotification(topic, NOTIFICATION_TITLE, message);
+        String notificationTitle = notification.getAnalyticTitle() + "-" + notification.getDeviceName();
+
+        notificationHelper.createNotification(topic, notificationTitle, message);
         Log.d(TAG, "End notification");
     }
 }

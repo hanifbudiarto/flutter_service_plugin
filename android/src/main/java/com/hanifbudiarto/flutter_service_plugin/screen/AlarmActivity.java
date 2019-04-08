@@ -3,13 +3,13 @@ package com.hanifbudiarto.flutter_service_plugin.screen;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
-import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.View;
 import android.view.WindowManager;
@@ -32,7 +32,7 @@ public class AlarmActivity extends AppCompatActivity {
     // Start without a delay
     // Vibrate for 100 milliseconds
     // Sleep for 1000 milliseconds
-    private long[] VIBRATE_PATTERN = {0, 100, 1000};
+    private final long[] VIBRATE_PATTERN = new long[]{0, 400, 800, 600, 800, 800, 800, 1000};
 
     private Vibrator vibrator;
     private MediaPlayer mediaPlayer;
@@ -112,20 +112,34 @@ public class AlarmActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        vibrator.cancel();
-        mediaPlayer.stop();
+        try {
+            vibrator.cancel();
+            mediaPlayer.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         super.onDestroy();
     }
 
     // keep repeating
     private void vibrateAlarm() {
         try {
-            // The '0' here means to repeat indefinitely
-            // '0' is actually the index at which the pattern keeps repeating from (the start)
-            // To repeat the pattern from any other point, you could increase the index, e.g. '1'
-            int repeatVibrate = 0;
-            vibrator.vibrate(VIBRATE_PATTERN, repeatVibrate);
-        } catch (Exception e) {
+            if (vibrator != null && vibrator.hasVibrator()) {
+
+                // The '0' here means to repeat indefinitely
+                // '0' is actually the index at which the pattern keeps repeating from (the start)
+                // To repeat the pattern from any other point, you could increase the index, e.g. '1'
+                int repeatVibrate = 0;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(
+                            VibrationEffect.createWaveform(VIBRATE_PATTERN, repeatVibrate)
+                    );
+                } else {
+                    vibrator.vibrate(VIBRATE_PATTERN, repeatVibrate);
+                }
+            }
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
