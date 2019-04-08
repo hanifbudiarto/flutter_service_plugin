@@ -1,6 +1,10 @@
 package com.hanifbudiarto.flutter_service_plugin.service;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
@@ -14,6 +18,7 @@ import com.hanifbudiarto.flutter_service_plugin.model.MqttNotification;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttPayload;
 import com.hanifbudiarto.flutter_service_plugin.model.User;
 import com.hanifbudiarto.flutter_service_plugin.util.DatabaseHelper;
+import com.hanifbudiarto.flutter_service_plugin.util.FlutterUtil;
 import com.hanifbudiarto.flutter_service_plugin.util.NotificationHelper;
 import com.hanifbudiarto.flutter_service_plugin.util.SocketFactory;
 
@@ -45,6 +50,7 @@ public class SamService extends Service {
     private final String TAG = getClass().getSimpleName();
 
     private final String NOTIFICATION_TITLE = "SAM IoT";
+    private final int NOTIFICATION_ID = 10099;
 
     // MQTT Broker
     // because broker can be changed sometimes
@@ -121,12 +127,15 @@ public class SamService extends Service {
                     Log.e(TAG, "Connected");
                 }
 
+                updateNotificationContent("Connected");
+
                 subscribe();
             }
 
             @Override
             public void connectionLost(Throwable cause) {
                 Log.d(TAG, "The Connection was lost. " + cause.getMessage());
+                updateNotificationContent("Connection was lost");
             }
 
             @Override
@@ -241,19 +250,7 @@ public class SamService extends Service {
             connect();
         }
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NotificationHelper.CHANNEL_ID)
-                .setContentTitle(NOTIFICATION_TITLE)
-                .setContentText("Notification and Alert Service")
-                .setOngoing(true);
-        // set notification logo
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder.setSmallIcon(R.drawable.ic_stat_logo_white_trans);
-            builder.setColor(Color.parseColor("#FF3F51B5"));
-        } else {
-            builder.setSmallIcon(R.drawable.ic_stat_logo_white_trans);
-        }
-
-        startForeground(10001, builder.build());
+        startForeground(NOTIFICATION_ID, getNotificationForForegroundService("Initializing"));
 
         return Service.START_STICKY;
     }
@@ -273,6 +270,27 @@ public class SamService extends Service {
         }
 
         super.onDestroy();
+    }
+
+    private Notification getNotificationForForegroundService(String content) {
+        // Create an explicit intent for an Activity in your app
+        Intent intent = new Intent(this, FlutterUtil.getMainActivityClass(this));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NotificationHelper.CHANNEL_ID)
+                .setContentTitle(NOTIFICATION_TITLE)
+                .setContentText(content)
+                .setContentIntent(pendingIntent)
+                .setOngoing(true);
+
+        return builder.build();
+
+    }
+
+    private void updateNotificationContent(String content) {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFICATION_ID, getNotificationForForegroundService(content));
     }
 
     // splitting string resulted from mqtt received

@@ -40,8 +40,8 @@ public class FlutterServicePlugin implements MethodCallHandler {
         break;
       case "register":
         // starting network change service
-        Intent networkChangeService = new Intent(activity, NetworkChangeService.class);
-        activity.startService(networkChangeService);
+        // Intent networkChangeService = new Intent(activity, NetworkChangeService.class);
+        // activity.startService(networkChangeService);
         break;
       default:
         result.notImplemented();
