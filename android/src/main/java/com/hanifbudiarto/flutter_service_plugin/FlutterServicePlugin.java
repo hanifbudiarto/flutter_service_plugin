@@ -35,6 +35,9 @@ public class FlutterServicePlugin implements MethodCallHandler {
       case "restartMqttService":
         restartMqttService();
         break;
+      case "stopMqttService":
+        stopMqttService();
+        break;
       case "register":
         // starting network change service
         Intent networkChangeService = new Intent(activity, NetworkChangeService.class);
@@ -46,11 +49,18 @@ public class FlutterServicePlugin implements MethodCallHandler {
     }
   }
 
-  // restarting mqtt service
-  private void restartMqttService() {
+  private boolean stopMqttService() {
     Intent intent = new Intent(activity, SamService.class);
     boolean stopped = activity.stopService(intent);
     Log.e(TAG,"Service stopped " + stopped);
+
+    return stopped;
+  }
+
+  // restarting mqtt service
+  private void restartMqttService() {
+    Intent intent = new Intent(activity, SamService.class);
+    stopMqttService();
 
     activity.startService(intent);
   }

@@ -8,6 +8,10 @@ class FlutterServicePlugin {
     _channel.invokeMethod("restartMqttService");
   }
 
+  static stopService() {
+    _channel.invokeMethod("stopMqttService");
+  }
+
   static register() {
     _channel.invokeMethod("register");
   }
