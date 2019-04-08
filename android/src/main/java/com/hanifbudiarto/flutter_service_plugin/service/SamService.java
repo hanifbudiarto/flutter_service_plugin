@@ -330,8 +330,12 @@ public class SamService extends Service {
                 payload.getValue(),
                 notification.getOption().getRule(),
                 notification.getOption().getThreshold());
+
+        Log.d(TAG, "Exceed threshold: " + isExceedThreshold);
+
         if (isExceedThreshold) {
 
+            Log.d(TAG, "IsNotify: " + notification.getOption().isNotify() + " IsAlert: " + notification.getOption().isAlert());
             if (notification.getOption().isNotify()) {
                 showNotification(notification, payload.getValue());
             }
