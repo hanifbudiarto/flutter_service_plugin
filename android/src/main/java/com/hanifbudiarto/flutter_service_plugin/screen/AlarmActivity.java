@@ -3,11 +3,13 @@ package com.hanifbudiarto.flutter_service_plugin.screen;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Vibrator;
 import android.view.View;
 import android.view.WindowManager;
@@ -24,6 +26,8 @@ public class AlarmActivity extends AppCompatActivity {
     public static final String EXTRA_VALUE = "value";
     public static final String EXTRA_TITLE = "title";
     public static final String EXTRA_DEVICE = "device";
+
+    private static final int TIME_OUT = 30000; // 30 s
 
     // Start without a delay
     // Vibrate for 100 milliseconds
@@ -90,6 +94,13 @@ public class AlarmActivity extends AppCompatActivity {
             }
         });
 
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                finish();
+            }
+        }, TIME_OUT);
     }
 
     @Override
