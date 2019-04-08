@@ -273,15 +273,9 @@ public class SamService extends Service {
     }
 
     private Notification getNotificationForForegroundService(String content) {
-        // Create an explicit intent for an Activity in your app
-        Intent intent = new Intent(this, FlutterUtil.getMainActivityClass(this));
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NotificationHelper.CHANNEL_ID)
                 .setContentTitle(NOTIFICATION_TITLE)
                 .setContentText(content)
-                .setContentIntent(pendingIntent)
                 .setOngoing(true);
 
         // set notification logo
