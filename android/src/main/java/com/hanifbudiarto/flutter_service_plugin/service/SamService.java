@@ -140,10 +140,12 @@ public class SamService extends Service {
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
-                MqttNotification notification = dbHelper.getNotificationsByTopic(topic);
+                List<MqttNotification> notifications = dbHelper.getAllNotificationsByTopic(topic);
 
-                String msg = new String(message.getPayload());
-                onMessageReceived(notification, getPayload(msg));
+                for(MqttNotification notification : notifications) {
+                    String msg = new String(message.getPayload());
+                    onMessageReceived(notification, getPayload(msg));
+                }
             }
 
             @Override

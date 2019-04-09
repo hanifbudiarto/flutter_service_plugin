@@ -35,11 +35,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
 
-    public MqttNotification getNotificationsByTopic(String topic) {
-        MqttNotification notification = null;
+    public List<MqttNotification> getAllNotificationsByTopic(String topic) {
+        List<MqttNotification> notifications = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
-        String selectQuery = "select analytic_id, analytic_resource_id, topic, options, device_name, analytic_title from notification where topic = '" +topic+"' limit 1";
+        String selectQuery = "select analytic_id, analytic_resource_id, topic, options, device_name, analytic_title from notification where topic = '" +topic+"'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -48,7 +48,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             do {
                 MqttOption option = gson.fromJson(cursor.getString(3), MqttOption.class);
 
-                MqttNotification result = new MqttNotification(
+                MqttNotification notification = new MqttNotification(
                         cursor.getString(0),
                         cursor.getString(1),
                         cursor.getString(2),
@@ -57,7 +57,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         cursor.getString(5)
                 );
 
-                notification = result;
+                notifications.add(notification);
 
             } while (cursor.moveToNext());
         }
@@ -65,7 +65,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // close db connection
         db.close();
 
-        return notification;
+        return notifications;
     }
 
     public User getUser() {
