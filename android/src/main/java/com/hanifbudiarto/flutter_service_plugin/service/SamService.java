@@ -295,15 +295,9 @@ public class SamService extends Service {
                 .setOngoing(true);
 
         // set notification logo
-        Bitmap icon = BitmapFactory.decodeResource(getResources(),R.drawable.ic_sam_notification_logo_trans);
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder.setSmallIcon(R.drawable.ic_sam_notification_logo_trans);
-            builder.setLargeIcon(icon);
-            builder.setColor(Color.parseColor("#FF3F51B5"));
-        } else {
-            builder.setSmallIcon(R.drawable.ic_sam_notification_logo_trans);
-            builder.setLargeIcon(icon);
-        }
+        Bitmap icon = BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher_round);
+        builder.setSmallIcon(R.drawable.ic_notification_alert_white_trans);
+        builder.setLargeIcon(icon);
 
         return builder.build();
 
