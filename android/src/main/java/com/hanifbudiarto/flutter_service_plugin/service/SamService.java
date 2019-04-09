@@ -294,10 +294,10 @@ public class SamService extends Service {
 
         // set notification logo
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder.setSmallIcon(R.drawable.ic_stat_logo_white_trans);
+            builder.setSmallIcon(R.drawable.ic_sam_notification_logo_trans);
             builder.setColor(Color.parseColor("#FF3F51B5"));
         } else {
-            builder.setSmallIcon(R.drawable.ic_stat_logo_white_trans);
+            builder.setSmallIcon(R.drawable.ic_sam_notification_logo_trans);
         }
 
         return builder.build();
