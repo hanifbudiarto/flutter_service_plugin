@@ -50,7 +50,6 @@ public class SamService extends Service {
     // error tag
     private final String TAG = getClass().getSimpleName();
 
-    private final String NOTIFICATION_TITLE = "SAM IoT";
     private final int NOTIFICATION_ID = 10099;
 
     // MQTT Broker
@@ -287,7 +286,7 @@ public class SamService extends Service {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this,
                 NotificationHelper.CHANNEL_ID)
-                .setContentTitle(NOTIFICATION_TITLE)
+                .setContentTitle("Server status")
                 .setContentText(content)
                 .setOngoing(true);
 
