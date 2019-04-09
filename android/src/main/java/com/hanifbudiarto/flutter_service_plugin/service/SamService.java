@@ -1,6 +1,7 @@
 package com.hanifbudiarto.flutter_service_plugin.service;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -273,7 +274,19 @@ public class SamService extends Service {
     }
 
     private Notification getNotificationForForegroundService(String content) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NotificationHelper.CHANNEL_ID)
+        NotificationManager notificationManager = (NotificationManager)
+                getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+        {
+            NotificationChannel notificationChannel = new NotificationChannel(
+                    NotificationHelper.CHANNEL_ID, NotificationHelper.CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this,
+                NotificationHelper.CHANNEL_ID)
                 .setContentTitle(NOTIFICATION_TITLE)
                 .setContentText(content)
                 .setOngoing(true);
@@ -291,7 +304,8 @@ public class SamService extends Service {
     }
 
     private void updateNotificationContent(String content) {
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager)
+                getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFICATION_ID, getNotificationForForegroundService(content));
     }
 

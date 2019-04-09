@@ -20,6 +20,7 @@ import androidx.core.app.NotificationCompat;
 public class NotificationHelper {
 
     public static final String CHANNEL_ID = "SAMElementNotificationChannelID";
+    public static final String CHANNEL_NAME = "SAMElementNotificationChannelName";
 
     private Context context;
 
@@ -69,7 +70,7 @@ public class NotificationHelper {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
             {
                 int importance = NotificationManager.IMPORTANCE_HIGH;
-                NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, "SAMElementNotificationChannelName", importance);
+                NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance);
                 notificationChannel.enableLights(true);
                 notificationChannel.setLightColor(Color.RED);
                 notificationChannel.enableVibration(true);
