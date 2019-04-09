@@ -30,7 +30,7 @@ public class NotificationHelper {
         this.context = context;
     }
 
-    public void createNotification(String topic, String title, String message) {
+    public void createNotification(String topic, String title, String message, Bitmap largeIcon) {
         try {
             // unique notification id
             BigInteger notificationId = new BigInteger(topic.getBytes());
@@ -60,14 +60,13 @@ public class NotificationHelper {
             * */
 
             // set notification logo
-            Bitmap icon = BitmapFactory.decodeResource(context.getResources(),R.drawable.ic_sam_notification_logo_trans);
             if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 builder.setSmallIcon(R.drawable.ic_sam_notification_logo_trans);
-                builder.setLargeIcon(icon);
+                builder.setLargeIcon(largeIcon);
                 builder.setColor(Color.parseColor("#FF3F51B5"));
             } else {
                 builder.setSmallIcon(R.drawable.ic_sam_notification_logo_trans);
-                builder.setLargeIcon(icon);
+                builder.setLargeIcon(largeIcon);
             }
 
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

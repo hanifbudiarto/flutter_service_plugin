@@ -429,8 +429,51 @@ public class SamService extends Service {
         }
 
         String notificationTitle = notification.getAnalyticTitle() + "-" + notification.getDeviceName();
+        Bitmap largeIcon = getLargeIconBitmap(notification.getAnalyticModel());
 
-        notificationHelper.createNotification(topic, notificationTitle, message);
+        notificationHelper.createNotification(topic, notificationTitle, message, largeIcon);
         Log.d(TAG, "End notification");
+    }
+
+    private Bitmap getLargeIconBitmap(String analyticModel) {
+        /*
+        Simple Time Series
+        Time Series With Bar
+        Horizontal Bar
+        Rounded Bar
+        Candlestick
+        Percentage Gauge
+        Button
+        Switch
+        Slider
+        LED
+        Bell
+        * */
+        switch(analyticModel.toLowerCase()) {
+            case "simple time series" :
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_line);
+            case "time series with bar" :
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_bar_real);
+            case "horizontal bar":
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_horizontal);
+            case "rounded bar":
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_round);
+            case "candlestick" :
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_ohlc);
+            case "percentage gauge" :
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_gauge);
+            case "button" :
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_bell_button);
+            case "switch" :
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_switch);
+            case "slider" :
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_slider);
+            case "led" :
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_led);
+            case "bell" :
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_bell);
+            default:
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher_round);
+        }
     }
 }
