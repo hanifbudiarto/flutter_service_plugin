@@ -30,10 +30,9 @@ public class NotificationHelper {
         this.context = context;
     }
 
-    public void createNotification(String topic, String title, String message, Bitmap largeIcon) {
+    public void createNotification(String analyticId, String title, String message, Bitmap largeIcon) {
         try {
-            // unique notification id
-            BigInteger notificationId = new BigInteger(topic.getBytes());
+            int notificationId = Integer.parseInt(analyticId);
 
             // Create an explicit intent for an Activity in your app
             Intent intent = new Intent(context, FlutterUtil.getMainActivityClass(context));
@@ -60,14 +59,9 @@ public class NotificationHelper {
             * */
 
             // set notification logo
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                builder.setSmallIcon(R.drawable.ic_sam_notification_logo_trans);
-                builder.setLargeIcon(largeIcon);
-                builder.setColor(Color.parseColor("#FF3F51B5"));
-            } else {
-                builder.setSmallIcon(R.drawable.ic_sam_notification_logo_trans);
-                builder.setLargeIcon(largeIcon);
-            }
+            builder.setSmallIcon(R.drawable.ic_sam_notification_logo_trans);
+            builder.setLargeIcon(largeIcon);
+
 
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -83,7 +77,7 @@ public class NotificationHelper {
                 notificationManager.createNotificationChannel(notificationChannel);
             }
 
-            notificationManager.notify(notificationId.intValue(), builder.build());
+            notificationManager.notify(notificationId, builder.build());
         }
         catch (Exception e) {
             e.printStackTrace();

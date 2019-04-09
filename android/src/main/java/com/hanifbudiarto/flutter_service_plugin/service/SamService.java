@@ -3,25 +3,21 @@ package com.hanifbudiarto.flutter_service_plugin.service;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.hanifbudiarto.flutter_service_plugin.screen.AlarmActivity;
 import com.hanifbudiarto.flutter_service_plugin.R;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttNotification;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttPayload;
 import com.hanifbudiarto.flutter_service_plugin.model.User;
+import com.hanifbudiarto.flutter_service_plugin.screen.AlarmActivity;
 import com.hanifbudiarto.flutter_service_plugin.util.DatabaseHelper;
-import com.hanifbudiarto.flutter_service_plugin.util.FlutterUtil;
 import com.hanifbudiarto.flutter_service_plugin.util.NotificationHelper;
 import com.hanifbudiarto.flutter_service_plugin.util.SocketFactory;
 
@@ -43,7 +39,9 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -52,7 +50,7 @@ public class SamService extends Service {
     // error tag
     private final String TAG = getClass().getSimpleName();
 
-    private final int NOTIFICATION_ID = 10099;
+    private int notificationId = -999;
 
     // MQTT Broker
     // because broker can be changed sometimes
@@ -254,7 +252,9 @@ public class SamService extends Service {
             connect();
         }
 
-        startForeground(NOTIFICATION_ID, getNotificationForForegroundService("Initializing"));
+        notificationId = createId();
+
+        startForeground(notificationId, getNotificationForForegroundService("Initializing"));
 
         return Service.START_STICKY;
     }
@@ -306,7 +306,7 @@ public class SamService extends Service {
     private void updateNotificationContent(String content) {
         NotificationManager notificationManager = (NotificationManager)
                 getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(NOTIFICATION_ID, getNotificationForForegroundService(content));
+        notificationManager.notify(notificationId, getNotificationForForegroundService(content));
     }
 
     // splitting string resulted from mqtt received
@@ -422,7 +422,6 @@ public class SamService extends Service {
 
     private void showNotification(MqttNotification notification, String valueReceived) {
         Log.d(TAG, "Trying to show notification");
-        String topic = notification.getTopic();
         String message = buildMessage(notification, valueReceived);
         if (notification.getOption().getText() != null && notification.getOption().getText().length() > 0) {
             message = notification.getOption().getText();
@@ -431,8 +430,14 @@ public class SamService extends Service {
         String notificationTitle = notification.getAnalyticTitle() + "-" + notification.getDeviceName();
         Bitmap largeIcon = getLargeIconBitmap(notification.getAnalyticModel());
 
-        notificationHelper.createNotification(topic, notificationTitle, message, largeIcon);
+        notificationHelper.createNotification(notification.getAnalyticId(), notificationTitle, message, largeIcon);
         Log.d(TAG, "End notification");
+    }
+
+    private int createId(){
+        Date now = new Date();
+        int id = Integer.parseInt(new SimpleDateFormat("ddHHmmss",  Locale.US).format(now));
+        return id;
     }
 
     private Bitmap getLargeIconBitmap(String analyticModel) {
