@@ -7,15 +7,17 @@ public class MqttNotification {
     private MqttOption option;
     private String deviceName;
     private String analyticTitle;
+    private String analyticModel;
 
     public MqttNotification(String analyticId, String resourceId, String topic, MqttOption option,
-                            String deviceName, String analyticTitle) {
+                            String deviceName, String analyticTitle, String analyticModel) {
         this.analyticId = analyticId;
         this.resourceId = resourceId;
         this.topic = topic;
         this.option = option;
         this.deviceName = deviceName;
         this.analyticTitle = analyticTitle;
+        this.analyticModel = analyticModel;
     }
 
     public String getAnalyticId() {
@@ -64,5 +66,13 @@ public class MqttNotification {
 
     public void setAnalyticTitle(String analyticTitle) {
         this.analyticTitle = analyticTitle;
+    }
+
+    public String getAnalyticModel() {
+        return analyticModel;
+    }
+
+    public void setAnalyticModel(String analyticModel) {
+        this.analyticModel = analyticModel;
     }
 }

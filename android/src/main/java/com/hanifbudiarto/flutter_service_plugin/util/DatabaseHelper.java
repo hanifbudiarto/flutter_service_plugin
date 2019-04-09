@@ -39,7 +39,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         List<MqttNotification> notifications = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
-        String selectQuery = "select analytic_id, analytic_resource_id, topic, options, device_name, analytic_title from notification where topic = '" +topic+"'";
+        String selectQuery = "select analytic_id, analytic_resource_id, topic, options, device_name, " +
+                "analytic_title, analytic_model from notification where topic = '" +topic+"'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -54,7 +55,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         cursor.getString(2),
                         option,
                         cursor.getString(4),
-                        cursor.getString(5)
+                        cursor.getString(5),
+                        cursor.getString(6)
                 );
 
                 notifications.add(notification);
@@ -105,7 +107,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         try {
             SQLiteDatabase db = this.getReadableDatabase();
-            String selectQuery = "select analytic_id, analytic_resource_id, topic, options, device_name, analytic_title from notification";
+            String selectQuery = "select analytic_id, analytic_resource_id, topic, options, " +
+                    "device_name, analytic_title, analytic_model from notification";
 
             Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -120,7 +123,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                             cursor.getString(2),
                             option,
                             cursor.getString(4),
-                            cursor.getString(5)
+                            cursor.getString(5),
+                            cursor.getString(6)
                     );
 
                     notifications.add(notification);
