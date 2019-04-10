@@ -210,11 +210,13 @@ public class SamService extends Service {
                         @Override
                         public void onSuccess(IMqttToken asyncActionToken) {
                             Log.d(TAG, "Successfully connected");
+                            updateNotificationContent("Connected");
                         }
 
                         @Override
                         public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
                             Log.d(TAG, "Failed to connect : " + exception.getMessage());
+                            updateNotificationContent("Failed to connect");
                         }
                     });
                 } catch (MqttException e) {
@@ -295,7 +297,7 @@ public class SamService extends Service {
                 .setOngoing(true);
 
         // set notification logo
-        Bitmap icon = BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher_round);
+        Bitmap icon = BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher);
         builder.setSmallIcon(R.drawable.ic_notification_alert_white_trans);
         builder.setLargeIcon(icon);
 
@@ -456,29 +458,29 @@ public class SamService extends Service {
         * */
         switch(analyticModel.toLowerCase()) {
             case "simple time series" :
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_line);
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_time_series);
             case "time series with bar" :
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_bar_real);
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_time_series_with_bar);
             case "horizontal bar":
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_horizontal);
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_horizontal_bar);
             case "rounded bar":
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_round);
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_rounded_bar);
             case "candlestick" :
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_ohlc);
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_candlestick);
             case "percentage gauge" :
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_gauge);
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_gauge);
             case "button" :
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_bell_button);
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_button);
             case "switch" :
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_switch);
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_switch);
             case "slider" :
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_slider);
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_slider);
             case "led" :
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_led);
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_led);
             case "bell" :
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_analytic_bell);
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_bell);
             default:
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher_round);
+                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher);
         }
     }
 }

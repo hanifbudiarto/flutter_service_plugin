@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -22,6 +23,8 @@ import com.hanifbudiarto.flutter_service_plugin.util.DatabaseHelper;
 
 // alarm activity always vibrate and play a ringtone
 public class AlarmActivity extends AppCompatActivity {
+
+    private final String TAG = getClass().getSimpleName();
 
     public static final String EXTRA_VALUE = "value";
     public static final String EXTRA_TITLE = "title";
@@ -116,7 +119,7 @@ public class AlarmActivity extends AppCompatActivity {
             vibrator.cancel();
             mediaPlayer.stop();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
         }
         super.onDestroy();
     }
@@ -140,7 +143,7 @@ public class AlarmActivity extends AppCompatActivity {
             }
         }
         catch (Exception e) {
-            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
         }
     }
 
@@ -148,7 +151,7 @@ public class AlarmActivity extends AppCompatActivity {
         try {
             mediaPlayer.start();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
         }
     }
 }
