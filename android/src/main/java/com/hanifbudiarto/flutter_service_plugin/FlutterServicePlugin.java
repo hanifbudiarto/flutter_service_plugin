@@ -1,7 +1,12 @@
 package com.hanifbudiarto.flutter_service_plugin;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.util.Log;
 
 import com.hanifbudiarto.flutter_service_plugin.service.NetworkChangeService;
@@ -39,9 +44,27 @@ public class FlutterServicePlugin implements MethodCallHandler {
         stopMqttService();
         break;
       case "register":
-        // starting network change service
-        // Intent networkChangeService = new Intent(activity, NetworkChangeService.class);
-        // activity.startService(networkChangeService);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+          try {
+            // register her is ignoring battery optimization
+            Intent ignoreOptimizationIntent = new Intent();
+
+            String packageName = activity.getPackageName();
+            PowerManager pm = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
+            if (pm.isIgnoringBatteryOptimizations(packageName)) {
+              ignoreOptimizationIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+            }
+            else {
+              ignoreOptimizationIntent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+              ignoreOptimizationIntent.setData(Uri.parse("package:" + packageName));
+            }
+            activity.startActivity(ignoreOptimizationIntent);
+          }
+          catch(Exception e) {
+            Log.d(TAG, e.getMessage());
+          }
+        }
         break;
       default:
         result.notImplemented();
