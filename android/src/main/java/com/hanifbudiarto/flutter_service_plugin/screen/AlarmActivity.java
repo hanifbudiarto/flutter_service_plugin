@@ -47,8 +47,16 @@ public class AlarmActivity extends AppCompatActivity {
         DatabaseHelper databaseHelper = new DatabaseHelper(this);
         AppSettings appSettings = databaseHelper.getAppSettings();
 
-        int themeId = Integer.parseInt(appSettings.getThemeId());
-        if (themeId <10) {
+        int themeId = 0;
+        try {
+            if (appSettings != null) themeId = Integer.parseInt(appSettings.getThemeId());
+        }
+        catch (Exception e) {
+            Log.d(TAG, e.getMessage());
+        }
+
+
+        if (themeId < 10) {
             setContentView(R.layout.activity_alarm);
         }
         else {
