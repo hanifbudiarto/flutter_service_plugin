@@ -292,13 +292,13 @@ public class SamService extends Service {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this,
                 NotificationHelper.CHANNEL_ID)
-                .setContentTitle("Server status")
+                .setContentTitle("Server Status")
                 .setContentText(content)
                 .setOngoing(true);
 
         // set notification logo
         Bitmap icon = BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher);
-        builder.setSmallIcon(R.drawable.ic_notification_alert_white_trans);
+        builder.setSmallIcon(R.drawable.ic_link);
         builder.setLargeIcon(icon);
 
         return builder.build();
@@ -429,7 +429,7 @@ public class SamService extends Service {
             message = notification.getOption().getText();
         }
 
-        String notificationTitle = notification.getAnalyticTitle() + "-" + notification.getDeviceName();
+        String notificationTitle = notification.getAnalyticTitle();
         Bitmap largeIcon = getLargeIconBitmap(notification.getAnalyticModel());
 
         notificationHelper.createNotification(notification.getAnalyticId(), notificationTitle, message, largeIcon);

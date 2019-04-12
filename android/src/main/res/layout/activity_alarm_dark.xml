@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:layout_centerHorizontal="true"
     android:background="@android:color/black"
+    android:orientation="vertical"
     android:padding="32dp"
     tools:context=".screen.AlarmActivity">
 
@@ -14,9 +14,9 @@
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ALERT"
-        android:gravity="center_horizontal"
         android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:text="ALERT"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:textColor="@android:color/white"
@@ -27,9 +27,9 @@
         android:id="@+id/imageView3"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
+        android:layout_gravity="center_horizontal"
         android:layout_weight="1"
         android:scaleType="fitCenter"
-        android:layout_gravity="center_horizontal"
         app:srcCompat="@drawable/warning" />
 
 
@@ -37,21 +37,22 @@
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pemkab Kabupaten Malang"
+        android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"
-        android:textColor="@android:color/white"
-        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-        android:layout_gravity="center_horizontal" />
+        android:text="Pemkab Kabupaten Malang"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@android:color/white" />
 
     <TextView
         android:id="@+id/tvDevice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Motion Sensor"
-        android:gravity="center_horizontal"
-        android:textColor="@android:color/white"
         android:layout_gravity="center_horizontal"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        android:gravity="center_horizontal"
+        android:text="Motion Sensor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:textColor="@android:color/white" />
+
     <TextView
         android:id="@+id/tvValue"
         android:layout_width="wrap_content"
@@ -62,17 +63,14 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:textColor="#6c63ff"
         android:textStyle="bold" />
+
     <Button
         android:id="@+id/btnClose"
         style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/darker_gray"
-        android:text="Close" />
-
-
-
-
+        android:text="Close"
+        android:textColor="@android:color/darker_gray" />
 
 
 </LinearLayout>
