@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.hanifbudiarto.flutter_service_plugin.service.NetworkChangeService;
 import com.hanifbudiarto.flutter_service_plugin.service.SamService;
@@ -56,6 +57,7 @@ public class FlutterServicePlugin implements MethodCallHandler {
               ignoreOptimizationIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
             }
             else {
+              Toast.makeText(activity, "Please turn off battery optimization for this application", Toast.LENGTH_LONG).show();
               ignoreOptimizationIntent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
               ignoreOptimizationIntent.setData(Uri.parse("package:" + packageName));
             }
