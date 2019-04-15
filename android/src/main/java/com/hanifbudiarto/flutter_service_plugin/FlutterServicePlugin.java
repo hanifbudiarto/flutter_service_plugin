@@ -57,7 +57,6 @@ public class FlutterServicePlugin implements MethodCallHandler {
               ignoreOptimizationIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
             }
             else {
-              Toast.makeText(activity, "Please turn off battery optimization for this application", Toast.LENGTH_LONG).show();
               ignoreOptimizationIntent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
               ignoreOptimizationIntent.setData(Uri.parse("package:" + packageName));
             }
