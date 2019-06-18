@@ -13,13 +13,17 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.hanifbudiarto.flutter_service_plugin.R;
+import com.hanifbudiarto.flutter_service_plugin.model.DeviceNotification;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttNotification;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttPayload;
 import com.hanifbudiarto.flutter_service_plugin.model.User;
 import com.hanifbudiarto.flutter_service_plugin.screen.AlarmActivity;
+import com.hanifbudiarto.flutter_service_plugin.screen.AlertActivity;
+import com.hanifbudiarto.flutter_service_plugin.util.AnalyticIconHelper;
 import com.hanifbudiarto.flutter_service_plugin.util.DatabaseHelper;
 import com.hanifbudiarto.flutter_service_plugin.util.NotificationHelper;
 import com.hanifbudiarto.flutter_service_plugin.util.SocketFactory;
+import com.hanifbudiarto.flutter_service_plugin.util.StateIndicatorHelper;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -88,8 +92,7 @@ public class SamService extends Service {
             password = user.getApiToken();
 
             Log.d(TAG, "onStartCommand : " + broker + " with " + username + " and " + password);
-        }
-        else {
+        } else {
             Log.d(TAG, "user is null");
         }
     }
@@ -116,14 +119,13 @@ public class SamService extends Service {
 
     private void initMqttClient() {
         Log.d(TAG, "initiating");
-        mqttAndroidClient = new MqttAndroidClient(this, broker, MqttClient.generateClientId() );
+        mqttAndroidClient = new MqttAndroidClient(this, broker, MqttClient.generateClientId());
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean reconnect, String serverURI) {
                 if (reconnect) {
                     Log.e(TAG, "Reconnected");
-                }
-                else {
+                } else {
                     Log.e(TAG, "Connected");
                 }
 
@@ -141,10 +143,19 @@ public class SamService extends Service {
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
                 List<MqttNotification> notifications = dbHelper.getAllNotificationsByTopic(topic);
+                if (notifications != null && notifications.size() > 0) {
+                    for (MqttNotification notification : notifications) {
+                        String msg = new String(message.getPayload());
+                        onMessageReceived(notification, getPayload(msg));
+                    }
+                }
 
-                for(MqttNotification notification : notifications) {
-                    String msg = new String(message.getPayload());
-                    onMessageReceived(notification, getPayload(msg));
+                List<DeviceNotification> deviceNotifications = dbHelper.getDeviceNotificationByTopic(topic);
+                if (deviceNotifications != null && deviceNotifications.size() > 0) {
+                    for (DeviceNotification notification : deviceNotifications) {
+                        String msg = new String(message.getPayload());
+                        onStateChanges(notification, msg);
+                    }
                 }
             }
 
@@ -159,15 +170,26 @@ public class SamService extends Service {
         Log.d(TAG, "loading topics");
 
         List<MqttNotification> notifications = dbHelper.getNotifications();
-        int size = notifications.size();
+        List<DeviceNotification> deviceNotifications = dbHelper.getDeviceNotifications();
+
+        int size = notifications.size() + deviceNotifications.size();
         int defaultQos = 0;
 
         topics = new String[size];
         qoss = new int[size];
 
         int index = 0;
-        for(MqttNotification notification : notifications) {
+        for (MqttNotification notification : notifications) {
             topics[index] = notification.getTopic();
+            qoss[index] = defaultQos;
+
+            index++;
+        }
+
+        index = 0;
+        for (DeviceNotification notification : deviceNotifications) {
+            // ${widget.device.developerId}/${widget.device.sn}/\$state
+            topics[index] = notification.getDeveloperId() + "/" + notification.getDeviceSn() + "/$state";
             qoss[index] = defaultQos;
 
             index++;
@@ -182,7 +204,7 @@ public class SamService extends Service {
                     @Override
                     public void onSuccess(IMqttToken asyncActionToken) {
                         Log.d(TAG, "Successfully subscribed");
-                        for(String topic : topics) {
+                        for (String topic : topics) {
                             Log.d(TAG, "topic : " + topic);
                         }
                     }
@@ -203,7 +225,7 @@ public class SamService extends Service {
         Thread connectThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "Connecting with username : " + username + " & password : " + password + " to "+ broker);
+                Log.d(TAG, "Connecting with username : " + username + " & password : " + password + " to " + broker);
 
                 try {
                     mqttAndroidClient.connect(mqttConnectOptions, null, new IMqttActionListener() {
@@ -235,7 +257,7 @@ public class SamService extends Service {
 
         // initialize helper class
         notificationHelper = new NotificationHelper(this);
-        dbHelper  = new DatabaseHelper(this);
+        dbHelper = new DatabaseHelper(this);
         formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     }
 
@@ -282,8 +304,7 @@ public class SamService extends Service {
         NotificationManager notificationManager = (NotificationManager)
                 getSystemService(Context.NOTIFICATION_SERVICE);
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-        {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(
                     NotificationHelper.CHANNEL_ID, NotificationHelper.CHANNEL_NAME,
                     NotificationManager.IMPORTANCE_DEFAULT);
@@ -297,7 +318,7 @@ public class SamService extends Service {
                 .setOngoing(true);
 
         // set notification logo
-        Bitmap icon = BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher);
+        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
         builder.setSmallIcon(R.drawable.ic_link);
         builder.setLargeIcon(icon);
 
@@ -329,12 +350,32 @@ public class SamService extends Service {
                 e.printStackTrace();
             }
 
-        }
-        else {
+        } else {
             payload = new MqttPayload(Calendar.getInstance().getTime(), message);
         }
 
         return payload;
+    }
+
+    private boolean isStateChecked(String checkedString, String state) {
+        if (checkedString.isEmpty()) return false;
+
+        return checkedString.contains(state.substring(0, 1));
+    }
+
+    private void onStateChanges(DeviceNotification notification, String state) {
+        Log.d(TAG, "State changed to: " + state);
+        if (notification.isNotify() && !state.equals(notification.getLastState())
+                && isStateChecked(notification.getNotifyChecked(), state)) {
+            showDeviceNotification(notification, state);
+        }
+
+        if (notification.isAlarm() && !state.equals(notification.getLastState())
+                && isStateChecked(notification.getAlarmChecked(), state)) {
+            launchAlertActivity(notification, state);
+        }
+
+        dbHelper.updateDeviceState(notification.getDeviceId(), state);
     }
 
     private void onMessageReceived(MqttNotification notification, MqttPayload payload) {
@@ -369,11 +410,11 @@ public class SamService extends Service {
         }
 
         switch (rule) {
-            case ">" :
+            case ">":
                 return Double.parseDouble(value) > threshold;
-            case "<" :
+            case "<":
                 return Double.parseDouble(value) < threshold;
-            case "=" :
+            case "=":
                 return Double.parseDouble(value) == threshold;
             default:
                 return false;
@@ -382,9 +423,12 @@ public class SamService extends Service {
 
     private String getComparisonString(String comp) {
         switch (comp) {
-            case ">": return "bigger than";
-            case "<" : return "lower than";
-            case "=" : return "equals";
+            case ">":
+                return "bigger than";
+            case "<":
+                return "lower than";
+            case "=":
+                return "equals";
         }
 
         return "";
@@ -395,13 +439,26 @@ public class SamService extends Service {
         if (notification != null) {
             if (notification.getOption().getRule().equals("#")) {
                 return value.toUpperCase();
-            }
-            else {
-                return value.toUpperCase() +" ( " +getComparisonString(notification.getOption().getRule()) + " "
+            } else {
+                return value.toUpperCase() + " ( " + getComparisonString(notification.getOption().getRule()) + " "
                         + notification.getOption().getThreshold() + " )";
             }
         }
         return "";
+    }
+
+    private void launchAlertActivity(DeviceNotification notification, String state) {
+        Intent secondIntent = new Intent(this, AlertActivity.class);
+
+        Bundle extras = new Bundle();
+        extras.putString(AlarmActivity.EXTRA_VALUE, state);
+        extras.putString(AlarmActivity.EXTRA_TITLE, notification.getDeviceName());
+        extras.putString(AlarmActivity.EXTRA_DEVICE, notification.getDeviceSn());
+
+        secondIntent.putExtras(extras);
+
+        secondIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+        startActivity(secondIntent);
     }
 
     private void launchAlarmActivity(MqttNotification notification, String valueReceived) {
@@ -422,6 +479,18 @@ public class SamService extends Service {
         startActivity(secondIntent);
     }
 
+    private void showDeviceNotification(DeviceNotification notification, String state) {
+        Log.d(TAG, "Trying to show device notification");
+        String message = notification.getDeviceName() + " is " + StateIndicatorHelper.getStateName(state);
+        String notificationTitle = notification.getDeviceName();
+        Bitmap largeIcon = StateIndicatorHelper.getStateImage(getResources(), state);
+
+        notificationHelper.createNotification(notification.getDeviceSn()
+                        + notification.getDeviceId() + notification.getDeveloperId(),
+                notificationTitle, message, largeIcon);
+        Log.d(TAG, "End notification");
+    }
+
     private void showNotification(MqttNotification notification, String valueReceived) {
         Log.d(TAG, "Trying to show notification");
         String message = buildMessage(notification, valueReceived);
@@ -430,57 +499,16 @@ public class SamService extends Service {
         }
 
         String notificationTitle = notification.getAnalyticTitle();
-        Bitmap largeIcon = getLargeIconBitmap(notification.getAnalyticModel());
+        Bitmap largeIcon = AnalyticIconHelper.getLargeIconBitmap(getResources(), notification.getAnalyticModel());
 
         notificationHelper.createNotification(notification.getAnalyticId(), notificationTitle, message, largeIcon);
         Log.d(TAG, "End notification");
     }
 
-    private int createId(){
+    private int createId() {
         Date now = new Date();
-        int id = Integer.parseInt(new SimpleDateFormat("ddHHmmss",  Locale.US).format(now));
+        int id = Integer.parseInt(new SimpleDateFormat("ddHHmmss", Locale.US).format(now));
         return id;
     }
 
-    private Bitmap getLargeIconBitmap(String analyticModel) {
-        /*
-        Simple Time Series
-        Time Series With Bar
-        Horizontal Bar
-        Rounded Bar
-        Candlestick
-        Percentage Gauge
-        Button
-        Switch
-        Slider
-        LED
-        Bell
-        * */
-        switch(analyticModel.toLowerCase()) {
-            case "simple time series" :
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_time_series);
-            case "time series with bar" :
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_time_series_with_bar);
-            case "horizontal bar":
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_horizontal_bar);
-            case "rounded bar":
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_rounded_bar);
-            case "candlestick" :
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_candlestick);
-            case "percentage gauge" :
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_gauge);
-            case "button" :
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_button);
-            case "switch" :
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_switch);
-            case "slider" :
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_slider);
-            case "led" :
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_led);
-            case "bell" :
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_bell);
-            default:
-                return BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher);
-        }
-    }
 }

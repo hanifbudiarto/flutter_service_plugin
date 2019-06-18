@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.gson.Gson;
 import com.hanifbudiarto.flutter_service_plugin.model.AppSettings;
+import com.hanifbudiarto.flutter_service_plugin.model.DeviceNotification;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttNotification;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttOption;
 import com.hanifbudiarto.flutter_service_plugin.model.User;
@@ -20,7 +21,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private Gson gson = new Gson();
 
     // Database Version
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     // Database Name
     private static final String DATABASE_NAME = "samelement.db";
@@ -30,17 +31,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onCreate(SQLiteDatabase db) {}
+    public void onCreate(SQLiteDatabase db) {
+    }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    }
 
     public List<MqttNotification> getAllNotificationsByTopic(String topic) {
         List<MqttNotification> notifications = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
         String selectQuery = "select analytic_id, analytic_resource_id, topic, options, device_name, " +
-                "analytic_title, analytic_model from notification where topic = '" +topic+"'";
+                "analytic_title, analytic_model from notification where topic = '" + topic + "'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -94,8 +97,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             // close db connection
             db.close();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -168,6 +170,87 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
         return appSettings;
+    }
+
+    public void updateDeviceState(String deviceId, String state) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "update device_notification set last_state ='"+state+"' where device_id='"+deviceId+"'";
+
+        Cursor cursor = db.rawQuery(query, null);
+        cursor.moveToFirst();
+        cursor.close();
+    }
+
+    public List<DeviceNotification> getDeviceNotificationByTopic(String topic) {
+        List<DeviceNotification> notifications = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String selectQuery = "select device_id, device_name, device_sn, developer_id, " +
+                "device_notify, device_alarm, topic, last_state, notify_checked, alarm_checked " +
+                "from device_notification where topic='" + topic + "'";
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                DeviceNotification notification = new DeviceNotification(
+                        cursor.getString(0),
+                        cursor.getString(1),
+                        cursor.getString(2),
+                        cursor.getString(3),
+                        cursor.getInt(4),
+                        cursor.getInt(5),
+                        cursor.getString(6),
+                        cursor.getString(7),
+                        cursor.getString(8),
+                        cursor.getString(9)
+                );
+
+                notifications.add(notification);
+
+            } while (cursor.moveToNext());
+        }
+
+        // close db connection
+        db.close();
+
+        return notifications;
+    }
+
+    public List<DeviceNotification> getDeviceNotifications() {
+        List<DeviceNotification> notifications = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String selectQuery = "select device_id, device_name, device_sn, developer_id, " +
+                "device_notify, device_alarm, topic, last_state, notify_checked, alarm_checked " +
+                "from device_notification";
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                DeviceNotification notification = new DeviceNotification(
+                        cursor.getString(0),
+                        cursor.getString(1),
+                        cursor.getString(2),
+                        cursor.getString(3),
+                        cursor.getInt(4),
+                        cursor.getInt(5),
+                        cursor.getString(6),
+                        cursor.getString(7),
+                        cursor.getString(8),
+                        cursor.getString(9)
+                );
+
+                notifications.add(notification);
+
+            } while (cursor.moveToNext());
+        }
+
+        // close db connection
+        db.close();
+
+        return notifications;
     }
 
 }

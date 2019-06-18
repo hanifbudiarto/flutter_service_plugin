@@ -8,10 +8,9 @@
     android:layout_centerHorizontal="true"
     android:background="@android:color/white"
     android:padding="32dp"
-    tools:context=".screen.AlarmActivity">
+    tools:context=".screen.AlertActivity">
 
     <TextView
-        android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
@@ -23,41 +22,41 @@
 
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/imageState"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:scaleType="fitCenter"
         android:layout_gravity="center_horizontal"
-        app:srcCompat="@drawable/warning" />
+        app:srcCompat="@drawable/usb_cable" />
 
 
     <TextView
-        android:id="@+id/tvTitle"
+        android:id="@+id/tvDeviceName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"
-        android:text="Pemkab Kabupaten Malang"
+        android:text="Sensor Kelembapan"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     <TextView
-        android:id="@+id/tvDevice"
+        android:id="@+id/tvSerialNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"
-        android:text="Motion Sensor"
+        android:text="123456789"
         android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
 
     <TextView
-        android:id="@+id/tvValue"
+        android:id="@+id/tvState"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"
-        android:text="TRUE"
+        android:text="INITIALIZING"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:textColor="#6c63ff"
         android:textStyle="bold" />
@@ -69,11 +68,4 @@
         android:textColor="@android:color/darker_gray"
         android:text="Close" />
 
-
-
-
-
-
 </LinearLayout>
-
-
