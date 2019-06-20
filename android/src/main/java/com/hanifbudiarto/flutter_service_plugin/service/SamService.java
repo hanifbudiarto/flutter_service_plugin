@@ -376,6 +376,9 @@ public class SamService extends Service {
     private void onMessageReceived(MqttNotification notification, MqttPayload payload) {
         if (payload == null) return;
 
+        Log.d(TAG, "notification " + notification.getOption().getRule()
+                + " " + notification.getOption().getThreshold());
+
         Log.d(TAG, "Incoming message: " + payload.getValue());
 
         boolean isExceedThreshold = exceedThreshold(
