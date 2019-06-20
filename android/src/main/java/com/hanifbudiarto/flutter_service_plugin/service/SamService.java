@@ -74,9 +74,6 @@ public class SamService extends Service {
     private String[] topics;
     private int[] qoss;
 
-    // database helper to load topics, broker address etc.
-    private DatabaseHelper dbHelper;
-
     // utility class for converting date format
     private SimpleDateFormat formatter;
 
@@ -84,7 +81,7 @@ public class SamService extends Service {
     private NotificationHelper notificationHelper;
 
     private void initBrokerAndAuth() {
-        User user = dbHelper.getUser();
+        User user = DatabaseHelper.getHelper(SamService.this).getUser();
 
         if (user != null) {
             broker = "ssl://" + user.getBroker() + ":8883";
@@ -142,7 +139,7 @@ public class SamService extends Service {
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
-                List<MqttNotification> notifications = dbHelper.getAllNotificationsByTopic(topic);
+                List<MqttNotification> notifications = DatabaseHelper.getHelper(SamService.this).getAllNotificationsByTopic(topic);
                 if (notifications != null && notifications.size() > 0) {
                     for (MqttNotification notification : notifications) {
                         String msg = new String(message.getPayload());
@@ -150,7 +147,7 @@ public class SamService extends Service {
                     }
                 }
 
-                List<DeviceNotification> deviceNotifications = dbHelper.getDeviceNotificationByTopic(topic);
+                List<DeviceNotification> deviceNotifications = DatabaseHelper.getHelper(SamService.this).getDeviceNotificationByTopic(topic);
                 if (deviceNotifications != null && deviceNotifications.size() > 0) {
                     for (DeviceNotification notification : deviceNotifications) {
                         String msg = new String(message.getPayload());
@@ -169,8 +166,8 @@ public class SamService extends Service {
     private void initTopics() {
         Log.d(TAG, "loading topics");
 
-        List<MqttNotification> notifications = dbHelper.getNotifications();
-        List<DeviceNotification> deviceNotifications = dbHelper.getDeviceNotifications();
+        List<MqttNotification> notifications = DatabaseHelper.getHelper(SamService.this).getNotifications();
+        List<DeviceNotification> deviceNotifications = DatabaseHelper.getHelper(SamService.this).getDeviceNotifications();
 
         int size = notifications.size() + deviceNotifications.size();
         int defaultQos = 0;
@@ -257,7 +254,6 @@ public class SamService extends Service {
 
         // initialize helper class
         notificationHelper = new NotificationHelper(this);
-        dbHelper = new DatabaseHelper(this);
         formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     }
 
@@ -375,7 +371,7 @@ public class SamService extends Service {
             launchAlertActivity(notification, state);
         }
 
-        dbHelper.updateDeviceState(notification.getDeviceId(), state);
+        DatabaseHelper.getHelper(SamService.this).updateDeviceState(notification.getDeviceId(), state);
     }
 
     private void onMessageReceived(MqttNotification notification, MqttPayload payload) {

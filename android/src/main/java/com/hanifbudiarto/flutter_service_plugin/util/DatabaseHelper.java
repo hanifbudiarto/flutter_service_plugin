@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import androidx.annotation.Nullable;
+
 import com.google.gson.Gson;
 import com.hanifbudiarto.flutter_service_plugin.model.AppSettings;
 import com.hanifbudiarto.flutter_service_plugin.model.DeviceNotification;
@@ -15,16 +17,19 @@ import com.hanifbudiarto.flutter_service_plugin.model.User;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.Nullable;
-
 public class DatabaseHelper extends SQLiteOpenHelper {
     private Gson gson = new Gson();
-
-    // Database Version
     private static final int DATABASE_VERSION = 4;
-
-    // Database Name
     private static final String DATABASE_NAME = "samelement.db";
+    public static DatabaseHelper instance;
+
+    public static synchronized DatabaseHelper getHelper(Context context)
+    {
+        if (instance == null)
+            instance = new DatabaseHelper(context);
+
+        return instance;
+    }
 
     public DatabaseHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -32,10 +37,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
     }
 
     public List<MqttNotification> getAllNotificationsByTopic(String topic) {
@@ -67,9 +74,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
 
-        // close db connection
-        db.close();
-
         return notifications;
     }
 
@@ -95,8 +99,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // close cursor
             cursor.close();
 
-            // close db connection
-            db.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -136,8 +138,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // close cursor
             cursor.close();
 
-            // close db connection
-            db.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -164,8 +164,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // close cursor
             cursor.close();
 
-            // close db connection
-            db.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -176,9 +174,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "update device_notification set last_state ='"+state+"' where device_id='"+deviceId+"'";
 
-        Cursor cursor = db.rawQuery(query, null);
-        cursor.moveToFirst();
-        cursor.close();
+        db.rawQuery(query, null);
     }
 
     public List<DeviceNotification> getDeviceNotificationByTopic(String topic) {
@@ -210,9 +206,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             } while (cursor.moveToNext());
         }
-
-        // close db connection
-        db.close();
 
         return notifications;
     }
@@ -247,10 +240,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
 
-        // close db connection
-        db.close();
-
         return notifications;
     }
-
 }

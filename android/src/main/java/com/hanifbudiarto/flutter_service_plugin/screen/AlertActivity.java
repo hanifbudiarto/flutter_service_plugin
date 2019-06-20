@@ -45,8 +45,7 @@ public class AlertActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DatabaseHelper databaseHelper = new DatabaseHelper(this);
-        AppSettings appSettings = databaseHelper.getAppSettings();
+        AppSettings appSettings = DatabaseHelper.getHelper(this).getAppSettings();
 
         int themeId = 0;
         try {

@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.hanifbudiarto.flutter_service_plugin.R;
 import com.hanifbudiarto.flutter_service_plugin.model.AppSettings;
+import com.hanifbudiarto.flutter_service_plugin.service.SamService;
 import com.hanifbudiarto.flutter_service_plugin.util.DatabaseHelper;
 
 // alarm activity always vibrate and play a ringtone
@@ -44,8 +45,7 @@ public class AlarmActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DatabaseHelper databaseHelper = new DatabaseHelper(this);
-        AppSettings appSettings = databaseHelper.getAppSettings();
+        AppSettings appSettings = DatabaseHelper.getHelper(this).getAppSettings();
 
         int themeId = 0;
         try {
