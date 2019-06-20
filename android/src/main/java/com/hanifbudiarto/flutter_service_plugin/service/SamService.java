@@ -183,7 +183,6 @@ public class SamService extends Service {
             index++;
         }
 
-        index = 0;
         for (DeviceNotification notification : deviceNotifications) {
             // ${widget.device.developerId}/${widget.device.sn}/\$state
             topics[index] = notification.getDeveloperId() + "/" + notification.getDeviceSn() + "/$state";
