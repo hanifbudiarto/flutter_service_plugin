@@ -210,6 +210,8 @@ public class SamService extends Service {
     }
 
     private void initFirstMessages() {
+        firstMessages = new boolean[topics.length];
+
         for (int i=0; i<topics.length; i++) {
             firstMessages[i] = true;
         }
