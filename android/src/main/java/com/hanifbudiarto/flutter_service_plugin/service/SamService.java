@@ -73,6 +73,7 @@ public class SamService extends Service {
     // list of topics and its QOS s
     private String[] topics;
     private int[] qoss;
+    private boolean[] firstMessages;
 
     // utility class for converting date format
     private SimpleDateFormat formatter;
@@ -114,6 +115,14 @@ public class SamService extends Service {
         }
     }
 
+    private int indexOf(String topic, String[] myTopics) {
+        for(int i=0; i<myTopics.length; i++) {
+            if (myTopics.equals(topic)) return i;
+        }
+
+        return -1;
+    }
+
     private void initMqttClient() {
         Log.d(TAG, "initiating");
         mqttAndroidClient = new MqttAndroidClient(this, broker, MqttClient.generateClientId());
@@ -139,6 +148,14 @@ public class SamService extends Service {
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
+                int index = indexOf(topic, topics);
+                if (index < 0) return;
+
+                if (firstMessages[index] == true) {
+                    firstMessages[index] = false;
+                    return;
+                }
+
                 List<MqttNotification> notifications = DatabaseHelper.getHelper(SamService.this).getAllNotificationsByTopic(topic);
                 if (notifications != null && notifications.size() > 0) {
                     for (MqttNotification notification : notifications) {
@@ -192,10 +209,19 @@ public class SamService extends Service {
         }
     }
 
+    private void initFirstMessages() {
+        for (int i=0; i<topics.length; i++) {
+            firstMessages[i] = true;
+        }
+    }
+
     // subscribe to broker
     private void subscribe() {
         try {
             if (topics != null && topics.length > 0 && qoss != null && qoss.length > 0) {
+
+                initFirstMessages();
+
                 mqttAndroidClient.subscribe(topics, qoss, null, new IMqttActionListener() {
                     @Override
                     public void onSuccess(IMqttToken asyncActionToken) {
