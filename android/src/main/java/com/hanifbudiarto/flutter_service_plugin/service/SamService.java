@@ -117,7 +117,7 @@ public class SamService extends Service {
 
     private int indexOf(String topic, String[] myTopics) {
         for(int i=0; i<myTopics.length; i++) {
-            if (myTopics.equals(topic)) return i;
+            if (myTopics[i].equals(topic)) return i;
         }
 
         return -1;
