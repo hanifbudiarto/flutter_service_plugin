@@ -149,13 +149,17 @@ public class SamService extends Service {
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
                 int index = indexOf(topic, topics);
+                Log.d(TAG, "Index topic" + index);
+
                 if (index < 0) return;
 
                 if (firstMessages[index] == true) {
+                    Log.d(TAG, "First Message for "+ topic);
                     firstMessages[index] = false;
                     return;
                 }
 
+                Log.d(TAG, "mencoba ");
                 List<MqttNotification> notifications = DatabaseHelper.getHelper(SamService.this).getAllNotificationsByTopic(topic);
                 if (notifications != null && notifications.size() > 0) {
                     for (MqttNotification notification : notifications) {
