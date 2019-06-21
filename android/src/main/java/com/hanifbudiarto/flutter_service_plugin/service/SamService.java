@@ -42,6 +42,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -213,12 +214,45 @@ public class SamService extends Service {
         }
     }
 
-    private void initFirstMessages() {
-        firstMessages = new boolean[topics.length];
+    private void initFirstMessages(String[] noDuplicateTopics) {
+        firstMessages = new boolean[noDuplicateTopics.length];
 
-        for (int i=0; i<topics.length; i++) {
+        for (int i=0; i<noDuplicateTopics.length; i++) {
             firstMessages[i] = true;
         }
+    }
+
+    private class SubscribeObj {
+        String[] topics;
+        int[] qoss;
+
+        SubscribeObj(String[] topics, int[] qoss) {
+            this.topics = topics;
+            this.qoss = qoss;
+        }
+    }
+
+    private SubscribeObj getTopicsWithoutDuplicate() {
+        List<String> list = new ArrayList<>();
+        List<Integer> qoss = new ArrayList<>();
+
+        for(int i=0; i<topics.length; i++) {
+            if (list.contains(topics[i])) continue;
+
+            list.add(topics[i]);
+            qoss.add(0);
+        }
+
+        String[] itemsArray = new String[list.size()];
+        int[] qossArray = new int[qoss.size()];
+
+        int index = 0;
+        for(Integer i : qoss) {
+            qossArray[index] = i.intValue();
+        }
+
+
+        return new SubscribeObj(list.toArray(itemsArray), qossArray);
     }
 
     // subscribe to broker
@@ -226,9 +260,12 @@ public class SamService extends Service {
         try {
             if (topics != null && topics.length > 0 && qoss != null && qoss.length > 0) {
 
-                initFirstMessages();
+                SubscribeObj noDup = getTopicsWithoutDuplicate();
+                String[] noDuplicateTopics = noDup.topics;
+                int[] noDuplicateQoss = noDup.qoss;
+                initFirstMessages(noDuplicateTopics);
 
-                mqttAndroidClient.subscribe(topics, qoss, null, new IMqttActionListener() {
+                mqttAndroidClient.subscribe(noDuplicateTopics, noDuplicateQoss, null, new IMqttActionListener() {
                     @Override
                     public void onSuccess(IMqttToken asyncActionToken) {
                         Log.d(TAG, "Successfully subscribed");
