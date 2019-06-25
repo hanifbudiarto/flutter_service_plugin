@@ -452,8 +452,7 @@ public class SamService extends Service {
 
         boolean isExceedThreshold = exceedThreshold(
                 payload.getValue(),
-                notification.getOption().getRule(),
-                notification.getOption().getThreshold());
+                notification);
 
         Log.d(TAG, "Exceed threshold: " + isExceedThreshold);
 
@@ -470,10 +469,20 @@ public class SamService extends Service {
         }
     }
 
-    private boolean exceedThreshold(String value, String rule, double threshold) {
+    private boolean xnor(boolean a, boolean b) {
+        return a == b;
+    }
+
+    private boolean exceedThreshold(String value, MqttNotification notification) {
+        String rule = notification.getOption().getRule();
+        double threshold = notification.getOption().getThreshold();
+
         if (rule.equals("#")) {
             // boolean datatype
-            return Boolean.parseBoolean(value) == (threshold == 1);
+            boolean isThresholdPassed = Boolean.parseBoolean(value) == (threshold == 1);
+
+            // more checking on activeState
+            return xnor(isThresholdPassed, notification.getActiveState() == 1);
         }
 
         switch (rule) {

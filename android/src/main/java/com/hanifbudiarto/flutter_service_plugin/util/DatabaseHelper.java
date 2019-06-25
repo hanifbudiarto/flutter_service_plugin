@@ -19,7 +19,7 @@ import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private Gson gson = new Gson();
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = "samelement.db";
     public static DatabaseHelper instance;
 
@@ -50,7 +50,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         String selectQuery = "select analytic_id, analytic_resource_id, topic, options, device_name, " +
-                "analytic_title, analytic_model from notification where topic = '" + topic + "'";
+                "analytic_title, analytic_model, active_state from notification where topic = '" + topic + "'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -66,7 +66,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         option,
                         cursor.getString(4),
                         cursor.getString(5),
-                        cursor.getString(6)
+                        cursor.getString(6),
+                        cursor.getInt(7)
                 );
 
                 notifications.add(notification);
@@ -112,7 +113,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db = this.getReadableDatabase();
             String selectQuery = "select analytic_id, analytic_resource_id, topic, options, " +
-                    "device_name, analytic_title, analytic_model from notification";
+                    "device_name, analytic_title, analytic_model, active_state from notification";
 
             Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -128,7 +129,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                             option,
                             cursor.getString(4),
                             cursor.getString(5),
-                            cursor.getString(6)
+                            cursor.getString(6),
+                            cursor.getInt(7)
                     );
 
                     notifications.add(notification);

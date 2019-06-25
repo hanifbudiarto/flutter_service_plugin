@@ -8,9 +8,10 @@ public class MqttNotification {
     private String deviceName;
     private String analyticTitle;
     private String analyticModel;
+    private int activeState;
 
     public MqttNotification(String analyticId, String resourceId, String topic, MqttOption option,
-                            String deviceName, String analyticTitle, String analyticModel) {
+                            String deviceName, String analyticTitle, String analyticModel, int activeState) {
         this.analyticId = analyticId;
         this.resourceId = resourceId;
         this.topic = topic;
@@ -18,6 +19,16 @@ public class MqttNotification {
         this.deviceName = deviceName;
         this.analyticTitle = analyticTitle;
         this.analyticModel = analyticModel;
+        this.activeState = activeState;
+    }
+
+
+    public int getActiveState() {
+        return activeState;
+    }
+
+    public void setActiveState(int activeState) {
+        this.activeState = activeState;
     }
 
     public String getAnalyticId() {
