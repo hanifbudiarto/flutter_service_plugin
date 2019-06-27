@@ -72,9 +72,9 @@ public class SamService extends Service {
     private MqttConnectOptions mqttConnectOptions;
 
     // list of topics and its QOS s
-    private String[] topics;
-    private int[] qoss;
+    private List<SubscribeObj> subscribeObjList = new ArrayList<>();
     private boolean[] firstMessages;
+    private Date subscribedTime;
 
     // utility class for converting date format
     private SimpleDateFormat formatter;
@@ -116,12 +116,19 @@ public class SamService extends Service {
         }
     }
 
-    private int indexOf(String topic, String[] myTopics) {
-        for(int i=0; i<myTopics.length; i++) {
-            if (myTopics[i].equals(topic)) return i;
+    private int indexOf(String topic, List<SubscribeObj> list) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).topic.equals(topic)) return i;
         }
 
         return -1;
+    }
+
+    private boolean exceedTimeLimit(Date date) {
+        final long timeLimit = 5;
+        long secondsBetween = (Calendar.getInstance().getTime().getTime() - date.getTime()) / 1000;
+
+        return secondsBetween > timeLimit;
     }
 
     private void initMqttClient() {
@@ -149,32 +156,32 @@ public class SamService extends Service {
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
-                int index = indexOf(topic, topics);
+                int index = indexOf(topic, subscribeObjList);
                 Log.d(TAG, "Index topic" + index);
 
                 if (index < 0) return;
 
-                if (firstMessages[index] == true) {
-                    Log.d(TAG, "First Message for "+ topic);
+                if (!firstMessages[index] || exceedTimeLimit(subscribedTime)) {
+                    List<MqttNotification> notifications = DatabaseHelper.getHelper(SamService.this).getAllNotificationsByTopic(topic);
+                    if (notifications != null && notifications.size() > 0) {
+                        for (MqttNotification notification : notifications) {
+                            String msg = new String(message.getPayload());
+                            onMessageReceived(notification, getPayload(msg));
+                        }
+                    }
+
+                    List<DeviceNotification> deviceNotifications = DatabaseHelper.getHelper(SamService.this).getDeviceNotificationByTopic(topic);
+                    if (deviceNotifications != null && deviceNotifications.size() > 0) {
+                        for (DeviceNotification notification : deviceNotifications) {
+                            String msg = new String(message.getPayload());
+                            onStateChanges(notification, msg);
+                        }
+                    }
+                }
+
+
+                if (firstMessages[index]) {
                     firstMessages[index] = false;
-                    return;
-                }
-
-                Log.d(TAG, "mencoba ");
-                List<MqttNotification> notifications = DatabaseHelper.getHelper(SamService.this).getAllNotificationsByTopic(topic);
-                if (notifications != null && notifications.size() > 0) {
-                    for (MqttNotification notification : notifications) {
-                        String msg = new String(message.getPayload());
-                        onMessageReceived(notification, getPayload(msg));
-                    }
-                }
-
-                List<DeviceNotification> deviceNotifications = DatabaseHelper.getHelper(SamService.this).getDeviceNotificationByTopic(topic);
-                if (deviceNotifications != null && deviceNotifications.size() > 0) {
-                    for (DeviceNotification notification : deviceNotifications) {
-                        String msg = new String(message.getPayload());
-                        onStateChanges(notification, msg);
-                    }
                 }
             }
 
@@ -191,87 +198,70 @@ public class SamService extends Service {
         List<MqttNotification> notifications = DatabaseHelper.getHelper(SamService.this).getNotifications();
         List<DeviceNotification> deviceNotifications = DatabaseHelper.getHelper(SamService.this).getDeviceNotifications();
 
-        int size = notifications.size() + deviceNotifications.size();
         int defaultQos = 0;
+        subscribeObjList = new ArrayList<>();
 
-        topics = new String[size];
-        qoss = new int[size];
-
-        int index = 0;
         for (MqttNotification notification : notifications) {
-            topics[index] = notification.getTopic();
-            qoss[index] = defaultQos;
-
-            index++;
+            SubscribeObj obj = new SubscribeObj(notification.getTopic(), defaultQos);
+            if (!subscribeObjList.contains(obj)) {
+                subscribeObjList.add(new SubscribeObj(notification.getTopic(), defaultQos));
+            }
         }
 
         for (DeviceNotification notification : deviceNotifications) {
             // ${widget.device.developerId}/${widget.device.sn}/\$state
-            topics[index] = notification.getDeveloperId() + "/" + notification.getDeviceSn() + "/$state";
-            qoss[index] = defaultQos;
-
-            index++;
+            SubscribeObj obj = new SubscribeObj(
+                    notification.getDeveloperId() + "/" + notification.getDeviceSn() + "/$state",
+                    defaultQos);
+            if (!subscribeObjList.contains(obj)) {
+                subscribeObjList.add(new SubscribeObj(
+                        notification.getDeveloperId() + "/" + notification.getDeviceSn() + "/$state",
+                        defaultQos));
+            }
         }
     }
 
-    private void initFirstMessages(String[] noDuplicateTopics) {
-        firstMessages = new boolean[noDuplicateTopics.length];
+    private void initFirstMessages(int size) {
+        firstMessages = new boolean[size];
 
-        for (int i=0; i<noDuplicateTopics.length; i++) {
+        for (int i = 0; i < size; i++) {
             firstMessages[i] = true;
         }
     }
 
     private class SubscribeObj {
-        String[] topics;
-        int[] qoss;
+        String topic;
+        int qos;
 
-        SubscribeObj(String[] topics, int[] qoss) {
-            this.topics = topics;
-            this.qoss = qoss;
+        SubscribeObj(String topic, int qos) {
+            this.topic = topic;
+            this.qos = qos;
         }
-    }
-
-    private SubscribeObj getTopicsWithoutDuplicate() {
-        List<String> list = new ArrayList<>();
-        List<Integer> qoss = new ArrayList<>();
-
-        for(int i=0; i<topics.length; i++) {
-            if (list.contains(topics[i])) continue;
-
-            list.add(topics[i]);
-            qoss.add(0);
-        }
-
-        String[] itemsArray = new String[list.size()];
-        int[] qossArray = new int[qoss.size()];
-
-        int index = 0;
-        for(Integer i : qoss) {
-            qossArray[index] = i.intValue();
-        }
-
-
-        return new SubscribeObj(list.toArray(itemsArray), qossArray);
     }
 
     // subscribe to broker
     private void subscribe() {
         try {
-            if (topics != null && topics.length > 0 && qoss != null && qoss.length > 0) {
+            if (subscribeObjList != null && subscribeObjList.size() > 0) {
+                String[] topics = new String[subscribeObjList.size()];
+                int[] qoss = new int[subscribeObjList.size()];
 
-                SubscribeObj noDup = getTopicsWithoutDuplicate();
-                String[] noDuplicateTopics = noDup.topics;
-                int[] noDuplicateQoss = noDup.qoss;
-                initFirstMessages(noDuplicateTopics);
+                for (int i = 0; i < subscribeObjList.size(); i++) {
+                    topics[i] = subscribeObjList.get(i).topic;
+                    qoss[i] = subscribeObjList.get(i).qos;
+                }
 
-                mqttAndroidClient.subscribe(noDuplicateTopics, noDuplicateQoss, null, new IMqttActionListener() {
+                initFirstMessages(subscribeObjList.size());
+
+                mqttAndroidClient.subscribe(topics, qoss, null, new IMqttActionListener() {
                     @Override
                     public void onSuccess(IMqttToken asyncActionToken) {
                         Log.d(TAG, "Successfully subscribed");
-                        for (String topic : topics) {
-                            Log.d(TAG, "topic : " + topic);
+                        for (SubscribeObj obj : subscribeObjList) {
+                            Log.d(TAG, "topic : " + obj.topic);
                         }
+
+                        subscribedTime = Calendar.getInstance().getTime();
                     }
 
                     @Override
