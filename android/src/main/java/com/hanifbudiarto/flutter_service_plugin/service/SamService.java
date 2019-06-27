@@ -128,6 +128,7 @@ public class SamService extends Service {
         final long timeLimit = 5;
         long secondsBetween = (Calendar.getInstance().getTime().getTime() - date.getTime()) / 1000;
 
+        Log.d(TAG, "exceed : " + secondsBetween);
         return secondsBetween > timeLimit;
     }
 
@@ -262,6 +263,7 @@ public class SamService extends Service {
                         }
 
                         subscribedTime = Calendar.getInstance().getTime();
+                        Log.d(TAG, "subscribed on : " + subscribedTime.toString());
                     }
 
                     @Override
