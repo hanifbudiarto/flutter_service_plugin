@@ -162,7 +162,7 @@ public class SamService extends Service {
 
                 if (index < 0) return;
 
-                if (!firstMessages[index] || exceedTimeLimit(subscribedTime)) {
+                if (!firstMessages[index] && exceedTimeLimit(subscribedTime)) {
                     List<MqttNotification> notifications = DatabaseHelper.getHelper(SamService.this).getAllNotificationsByTopic(topic);
                     if (notifications != null && notifications.size() > 0) {
                         for (MqttNotification notification : notifications) {
