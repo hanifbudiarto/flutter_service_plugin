@@ -527,7 +527,7 @@ public class SamService extends Service {
 
         secondIntent.putExtras(extras);
 
-        secondIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+        secondIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(secondIntent);
     }
 
@@ -545,7 +545,7 @@ public class SamService extends Service {
 
         secondIntent.putExtras(extras);
 
-        secondIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+        secondIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(secondIntent);
     }
 
