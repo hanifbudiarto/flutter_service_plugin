@@ -144,9 +144,6 @@ public class SamService extends Service {
                 } else {
                     Log.e(TAG, "Connected");
                 }
-
-                updateNotificationContent("Connected");
-
                 subscribe();
             }
 
@@ -244,6 +241,7 @@ public class SamService extends Service {
 
     // subscribe to broker
     private void subscribe() {
+        updateNotificationContent("Subscribing");
         try {
             if (subscribeObjList != null && subscribeObjList.size() > 0) {
                 String[] topics = new String[subscribeObjList.size()];
@@ -266,6 +264,8 @@ public class SamService extends Service {
 
                         subscribedTime = Calendar.getInstance().getTime();
                         Log.d(TAG, "subscribed on : " + subscribedTime.toString());
+
+                        updateNotificationContent("Connected");
                     }
 
                     @Override
