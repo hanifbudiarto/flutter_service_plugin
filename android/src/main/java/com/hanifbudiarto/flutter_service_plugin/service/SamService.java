@@ -126,7 +126,7 @@ public class SamService extends Service {
     }
 
     private boolean exceedTimeLimit(Date date) {
-        final long timeLimit = 2;
+        final long timeLimit = 0;
         long secondsBetween = (Calendar.getInstance().getTime().getTime() - date.getTime()) / 1000;
 
         Log.d(TAG, "exceed : " + secondsBetween);
