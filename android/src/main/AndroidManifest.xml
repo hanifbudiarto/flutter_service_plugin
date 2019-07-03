@@ -12,9 +12,16 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application android:name="io.flutter.app.FlutterApplication">
-        <activity android:name=".screen.AlertActivity"></activity>
+        <activity android:name=".screen.AlertActivity"
+            android:launchMode="singleTop"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:showOnLockScreen="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:turnScreenOn="true"></activity>
         <activity
             android:name=".screen.AlarmActivity"
+            android:launchMode="singleTop"
             android:excludeFromRecents="true"
             android:noHistory="true"
             android:showOnLockScreen="true"

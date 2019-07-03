@@ -3,6 +3,7 @@ package com.hanifbudiarto.flutter_service_plugin.screen;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -115,6 +116,13 @@ public class AlertActivity extends AppCompatActivity {
                 finish();
             }
         }, TIME_OUT);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        // because single top
     }
 
     @Override
