@@ -159,10 +159,11 @@ public class SamService extends Service {
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
                 int index = indexOf(topic, subscribeObjList);
-                Log.d(TAG, "Index topic" + index);
 
                 if (index < 0) return;
 
+                Log.d(TAG, "first message: " + firstMessages[index] + " index: " + index+
+                        " topic: "+topic + " msg: " + new String(message.getPayload()));
                 if (!firstMessages[index] && exceedTimeLimit(subscribedTime)) {
                     List<MqttNotification> notifications = DatabaseHelper.getHelper(SamService.this).getAllNotificationsByTopic(topic);
                     if (notifications != null && notifications.size() > 0) {
