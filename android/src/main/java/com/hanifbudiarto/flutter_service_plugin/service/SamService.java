@@ -19,6 +19,7 @@ import com.hanifbudiarto.flutter_service_plugin.model.MqttPayload;
 import com.hanifbudiarto.flutter_service_plugin.model.User;
 import com.hanifbudiarto.flutter_service_plugin.screen.AlarmActivity;
 import com.hanifbudiarto.flutter_service_plugin.screen.AlertActivity;
+import com.hanifbudiarto.flutter_service_plugin.screen.IntentKey;
 import com.hanifbudiarto.flutter_service_plugin.util.AnalyticIconHelper;
 import com.hanifbudiarto.flutter_service_plugin.util.DatabaseHelper;
 import com.hanifbudiarto.flutter_service_plugin.util.NotificationHelper;
@@ -519,13 +520,13 @@ public class SamService extends Service {
         Intent secondIntent = new Intent(this, AlertActivity.class);
 
         Bundle extras = new Bundle();
-        extras.putString(AlarmActivity.EXTRA_VALUE, state);
-        extras.putString(AlarmActivity.EXTRA_TITLE, notification.getDeviceName());
-        extras.putString(AlarmActivity.EXTRA_DEVICE, notification.getDeviceSn());
+        extras.putString(IntentKey.EXTRA_VALUE, state);
+        extras.putString(IntentKey.EXTRA_TITLE, notification.getDeviceName());
+        extras.putString(IntentKey.EXTRA_DEVICE, notification.getDeviceSn());
 
         secondIntent.putExtras(extras);
 
-        secondIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+        secondIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         startActivity(secondIntent);
     }
 
@@ -537,13 +538,13 @@ public class SamService extends Service {
         if (notification.getOption().getText() != null && notification.getOption().getText().length() > 0) {
             valueReceived = notification.getOption().getText();
         }
-        extras.putString(AlarmActivity.EXTRA_VALUE, valueReceived);
-        extras.putString(AlarmActivity.EXTRA_TITLE, notification.getAnalyticTitle());
-        extras.putString(AlarmActivity.EXTRA_DEVICE, notification.getDeviceName());
+        extras.putString(IntentKey.EXTRA_VALUE, valueReceived);
+        extras.putString(IntentKey.EXTRA_TITLE, notification.getAnalyticTitle());
+        extras.putString(IntentKey.EXTRA_DEVICE, notification.getDeviceName());
 
         secondIntent.putExtras(extras);
 
-        secondIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+        secondIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         startActivity(secondIntent);
     }
 

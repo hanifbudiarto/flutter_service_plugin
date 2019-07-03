@@ -27,20 +27,14 @@ import com.hanifbudiarto.flutter_service_plugin.util.StateIndicatorHelper;
 public class AlertActivity extends AppCompatActivity {
 
     private final String TAG = getClass().getSimpleName();
-
-    public static final String EXTRA_VALUE = "value";
-    public static final String EXTRA_TITLE = "title";
-    public static final String EXTRA_DEVICE = "device";
-
-    private static final int TIME_OUT = 30000; // 30 s
-
-    // Start without a delay
-    // Vibrate for 100 milliseconds
-    // Sleep for 1000 milliseconds
-    private final long[] VIBRATE_PATTERN = new long[]{0, 400, 800, 600, 800, 800, 800, 1000};
-
     private Vibrator vibrator;
     private MediaPlayer mediaPlayer;
+
+    private TextView tvState;
+    private TextView tvDeviceName;
+    private TextView tvSerialNumber;
+    private ImageView ivState;
+    private Button btnClose;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,16 +45,14 @@ public class AlertActivity extends AppCompatActivity {
         int themeId = 0;
         try {
             if (appSettings != null) themeId = Integer.parseInt(appSettings.getThemeId());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
 
 
         if (themeId < 10) {
             setContentView(R.layout.activity_alert);
-        }
-        else {
+        } else {
             setContentView(R.layout.activity_alert_dark);
         }
 
@@ -84,24 +76,11 @@ public class AlertActivity extends AppCompatActivity {
                     | WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
         }
 
-        // initialize variable from bundle values
-        String value = getIntent().getStringExtra(EXTRA_VALUE); // state polos
-        String title = getIntent().getStringExtra(EXTRA_TITLE); // name
-        String device = getIntent().getStringExtra(EXTRA_DEVICE); // sn
-
-        TextView tvState = findViewById(R.id.tvState);
-        tvState.setText(StateIndicatorHelper.getStateName(value));
-
-        TextView tvDeviceName = findViewById(R.id.tvDeviceName);
-        tvDeviceName.setText(title);
-
-        TextView tvSerialNumber = findViewById(R.id.tvSerialNumber);
-        tvSerialNumber.setText(device);
-
-        ImageView ivState = findViewById(R.id.imageState);
-        ivState.setImageBitmap(StateIndicatorHelper.getStateImage(getResources(), value));
-
-        Button btnClose = findViewById(R.id.btnClose);
+        tvState = findViewById(R.id.tvState);
+        tvDeviceName = findViewById(R.id.tvDeviceName);
+        tvSerialNumber = findViewById(R.id.tvSerialNumber);
+        ivState = findViewById(R.id.imageState);
+        btnClose = findViewById(R.id.btnClose);
         btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -109,13 +88,12 @@ public class AlertActivity extends AppCompatActivity {
             }
         });
 
-
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 finish();
             }
-        }, TIME_OUT);
+        }, IntentKey.TIME_OUT);
     }
 
     @Override
@@ -123,6 +101,23 @@ public class AlertActivity extends AppCompatActivity {
         super.onNewIntent(intent);
 
         // because single top
+        setIntent(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // initialize variable from bundle values
+        String value = getIntent().getStringExtra(IntentKey.EXTRA_VALUE); // state polos
+        String title = getIntent().getStringExtra(IntentKey.EXTRA_TITLE); // name
+        String device = getIntent().getStringExtra(IntentKey.EXTRA_DEVICE); // sn
+
+
+        tvState.setText(StateIndicatorHelper.getStateName(value));
+        tvDeviceName.setText(title);
+        tvSerialNumber.setText(device);
+        ivState.setImageBitmap(StateIndicatorHelper.getStateImage(getResources(), value));
     }
 
     @Override
@@ -154,14 +149,13 @@ public class AlertActivity extends AppCompatActivity {
                 int repeatVibrate = 0;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     vibrator.vibrate(
-                            VibrationEffect.createWaveform(VIBRATE_PATTERN, repeatVibrate)
+                            VibrationEffect.createWaveform(IntentKey.VIBRATE_PATTERN, repeatVibrate)
                     );
                 } else {
-                    vibrator.vibrate(VIBRATE_PATTERN, repeatVibrate);
+                    vibrator.vibrate(IntentKey.VIBRATE_PATTERN, repeatVibrate);
                 }
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
     }

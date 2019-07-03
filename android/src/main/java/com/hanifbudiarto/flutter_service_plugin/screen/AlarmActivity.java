@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hanifbudiarto.flutter_service_plugin.R;
@@ -27,20 +28,13 @@ import com.hanifbudiarto.flutter_service_plugin.util.DatabaseHelper;
 public class AlarmActivity extends AppCompatActivity {
 
     private final String TAG = getClass().getSimpleName();
-
-    public static final String EXTRA_VALUE = "value";
-    public static final String EXTRA_TITLE = "title";
-    public static final String EXTRA_DEVICE = "device";
-
-    private static final int TIME_OUT = 30000; // 30 s
-
-    // Start without a delay
-    // Vibrate for 100 milliseconds
-    // Sleep for 1000 milliseconds
-    private final long[] VIBRATE_PATTERN = new long[]{0, 400, 800, 600, 800, 800, 800, 1000};
-
     private Vibrator vibrator;
     private MediaPlayer mediaPlayer;
+
+    private TextView tvValue;
+    private TextView tvDevice;
+    private TextView tvTitle;
+    private Button btnClose;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,21 +78,11 @@ public class AlarmActivity extends AppCompatActivity {
                     | WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
         }
 
-        // initialize variable from bundle values
-        String value = getIntent().getStringExtra(EXTRA_VALUE);
-        String title = getIntent().getStringExtra(EXTRA_TITLE);
-        String device = getIntent().getStringExtra(EXTRA_DEVICE);
+        tvValue = findViewById(R.id.tvValue);
+        tvDevice = findViewById(R.id.tvDevice);
+        tvTitle = findViewById(R.id.tvTitle);
 
-        TextView tvValue = findViewById(R.id.tvValue);
-        tvValue.setText(value);
-
-        TextView tvDevice = findViewById(R.id.tvDevice);
-        tvDevice.setText(device);
-
-        TextView tvTitle = findViewById(R.id.tvTitle);
-        tvTitle.setText(title);
-
-        Button btnClose = findViewById(R.id.btnClose);
+        btnClose = findViewById(R.id.btnClose);
         btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,13 +90,12 @@ public class AlarmActivity extends AppCompatActivity {
             }
         });
 
-
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 finish();
             }
-        }, TIME_OUT);
+        }, IntentKey.TIME_OUT);
     }
 
     @Override
@@ -120,6 +103,20 @@ public class AlarmActivity extends AppCompatActivity {
         super.onNewIntent(intent);
 
         // because single top
+        setIntent(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // initialize variable from bundle values
+        String value = getIntent().getStringExtra(IntentKey.EXTRA_VALUE);
+        String title = getIntent().getStringExtra(IntentKey.EXTRA_TITLE);
+        String device = getIntent().getStringExtra(IntentKey.EXTRA_DEVICE);
+
+        tvValue.setText(value);
+        tvDevice.setText(device);
+        tvTitle.setText(title);
     }
 
     @Override
@@ -151,10 +148,10 @@ public class AlarmActivity extends AppCompatActivity {
                 int repeatVibrate = 0;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     vibrator.vibrate(
-                            VibrationEffect.createWaveform(VIBRATE_PATTERN, repeatVibrate)
+                            VibrationEffect.createWaveform(IntentKey.VIBRATE_PATTERN, repeatVibrate)
                     );
                 } else {
-                    vibrator.vibrate(VIBRATE_PATTERN, repeatVibrate);
+                    vibrator.vibrate(IntentKey.VIBRATE_PATTERN, repeatVibrate);
                 }
             }
         }
