@@ -159,8 +159,8 @@ public class SamService extends Service {
 
                 if (index < 0) return;
 
-                Log.d(TAG, "first message: " + firstMessages[index] + " index: " + index+
-                        " topic: "+topic + " msg: " + new String(message.getPayload()));
+                Log.d(TAG, "first message: " + firstMessages[index] + " index: " + index +
+                        " topic: " + topic + " msg: " + new String(message.getPayload()));
                 if (!firstMessages[index] && exceedTimeLimit(subscribedTime)) {
                     List<MqttNotification> notifications = DatabaseHelper.getHelper(SamService.this).getAllNotificationsByTopic(topic);
                     if (notifications != null && notifications.size() > 0) {
@@ -527,7 +527,7 @@ public class SamService extends Service {
 
         secondIntent.putExtras(extras);
 
-        secondIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        secondIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         startActivity(secondIntent);
     }
 
@@ -545,7 +545,7 @@ public class SamService extends Service {
 
         secondIntent.putExtras(extras);
 
-        secondIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        secondIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         startActivity(secondIntent);
     }
 
