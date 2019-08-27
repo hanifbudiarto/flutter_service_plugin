@@ -12,19 +12,18 @@ import com.hanifbudiarto.flutter_service_plugin.model.AppSettings;
 import com.hanifbudiarto.flutter_service_plugin.model.DeviceNotification;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttNotification;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttOption;
-import com.hanifbudiarto.flutter_service_plugin.model.User;
+import com.hanifbudiarto.flutter_service_plugin.model.UserPrefs;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private Gson gson = new Gson();
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
     private static final String DATABASE_NAME = "samelement.db";
     public static DatabaseHelper instance;
 
-    public static synchronized DatabaseHelper getHelper(Context context)
-    {
+    public static synchronized DatabaseHelper getHelper(Context context) {
         if (instance == null)
             instance = new DatabaseHelper(context);
 
@@ -78,21 +77,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return notifications;
     }
 
-    public User getUser() {
-        User user = null;
+    public UserPrefs getUserPrefs() {
+        UserPrefs userPrefs = null;
 
         try {
             SQLiteDatabase db = this.getReadableDatabase();
-            String selectQuery = "select api_username, api_password, broker from user limit 1";
+            String selectQuery = "select user_access_token, user_refresh_token, developer_refresh_token, broker from user_prefs limit 1";
 
             Cursor cursor = db.rawQuery(selectQuery, null);
 
             // looping through all rows and adding to list
             if (cursor.moveToFirst()) {
                 do {
-                    user = new User(cursor.getString(0),
+                    userPrefs = new UserPrefs(cursor.getString(0),
                             cursor.getString(1),
-                            cursor.getString(2));
+                            cursor.getString(2),
+                            cursor.getString(3));
 
                 } while (cursor.moveToNext());
             }
@@ -104,7 +104,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
 
-        return user;
+        return userPrefs;
     }
 
     public List<MqttNotification> getNotifications() {
@@ -174,7 +174,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void updateDeviceState(String deviceId, String state) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String query = "update device_notification set last_state ='"+state+"' where device_id='"+deviceId+"'";
+        String query = "update device_notification set last_state ='" + state + "' where device_id='" + deviceId + "'";
 
         db.rawQuery(query, null);
     }

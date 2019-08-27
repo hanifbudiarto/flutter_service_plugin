@@ -16,7 +16,7 @@ import com.hanifbudiarto.flutter_service_plugin.R;
 import com.hanifbudiarto.flutter_service_plugin.model.DeviceNotification;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttNotification;
 import com.hanifbudiarto.flutter_service_plugin.model.MqttPayload;
-import com.hanifbudiarto.flutter_service_plugin.model.User;
+import com.hanifbudiarto.flutter_service_plugin.model.UserPrefs;
 import com.hanifbudiarto.flutter_service_plugin.screen.AlarmActivity;
 import com.hanifbudiarto.flutter_service_plugin.screen.AlertActivity;
 import com.hanifbudiarto.flutter_service_plugin.screen.IntentKey;
@@ -84,12 +84,12 @@ public class SamService extends Service {
     private NotificationHelper notificationHelper;
 
     private void initBrokerAndAuth() {
-        User user = DatabaseHelper.getHelper(SamService.this).getUser();
+        UserPrefs userPrefs = DatabaseHelper.getHelper(SamService.this).getUserPrefs();
 
-        if (user != null) {
-            broker = "ssl://" + user.getBroker() + ":8883";
-            username = user.getApiKey();
-            password = user.getApiToken();
+        if (userPrefs != null) {
+            broker = "ssl://" + userPrefs.getBroker() + ":8883";
+            username = userPrefs.getUserAccessToken();
+            password = "jwt";
 
             Log.d(TAG, "onStartCommand : " + broker + " with " + username + " and " + password);
         } else {
